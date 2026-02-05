@@ -99,7 +99,7 @@ loginForm.addEventListener('submit', function(e) {
     
     // For now, just show success message
     console.log('Login attempt:', { email, password });
-    alert('✅ Login Successful!\n\nEmail: ' + email + '\n\n(Connect to Flask backend to make this functional)');
+    alert('✅ Login Successful!\n\nEmail: ' + email + '\n\n');
     
     // Close modal
     loginModal.style.display = 'none';
@@ -118,34 +118,28 @@ signupForm.addEventListener('submit', function(e) {
     const confirmPassword = document.getElementById('confirm-password').value;
     const termsAccepted = document.getElementById('terms').checked;
     
-    // Validation: Check full name
+    //Check full name
     if (name.length < 2) {
         alert('❌ Please enter your full name (at least 2 characters)');
         return;
     }
     
-    // Validation: Check email format
+    //Check email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
         alert('❌ Please enter a valid email address');
         return;
     }
     
-    // Validation: Check password length
+    //Check password length
     if (password.length < 6) {
         alert('❌ Password must be at least 6 characters long');
         return;
     }
     
-    // Validation: Check if passwords match
+    //Check if passwords match
     if (password !== confirmPassword) {
         alert('❌ Passwords do not match! Please try again.');
-        return;
-    }
-    
-    // Validation: Check terms acceptance
-    if (!termsAccepted) {
-        alert('❌ Please accept the Terms & Conditions to continue');
         return;
     }
     
