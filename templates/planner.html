@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>PlanGo – Trip Planner</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+/* RESET & BASE  */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --primary:#2563eb;--primary-d:#1d4ed8;--primary-l:#dbeafe;
+  --accent:#0ea5e9;--green:#10b981;--warn:#f59e0b;--danger:#ef4444;
+  --bg:#f0f4ff;--card:#ffffff;--nav:#1e293b;--sidebar:#ffffff;
+  --text:#0f172a;--muted:#64748b;--border:#e2e8f0;
+  --shadow:0 4px 20px rgba(0,0,0,.08);--shadow-lg:0 10px 40px rgba(0,0,0,.12);
+  --radius:14px;--r-sm:8px;
+}
+body{font-family:'Poppins',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+
+/* NAVBAR  */
+.navbar{background:var(--nav);padding:0 28px;height:60px;display:flex;
+        align-items:center;justify-content:space-between;
+        position:sticky;top:0;z-index:200;box-shadow:0 2px 12px rgba(0,0,0,.2)}
+.nav-brand{display:flex;align-items:center;gap:10px}
+.nav-logo{font-size:24px}
+.nav-title{font-size:1.4rem;font-weight:700;color:#fff;letter-spacing:-.02em}
+.nav-title span{color:#60a5fa}
+.nav-right{display:flex;align-items:center;gap:12px}
+.nav-user{color:#94a3b8;font-size:.85rem;display:flex;align-items:center;gap:8px}
+.avatar{width:32px;height:32px;background:linear-gradient(135deg,var(--primary),var(--accent));
+        border-radius:50%;display:flex;align-items:center;justify-content:center;
+        color:#fff;font-weight:600;font-size:.8rem}
+.nav-logout{padding:6px 14px;background:transparent;border:1px solid rgba(255,255,255,.2);
+            border-radius:6px;color:#94a3b8;font-size:.8rem;cursor:pointer;
+            transition:all .2s;font-family:'Poppins',sans-serif}
+.nav-logout:hover{border-color:#ef4444;color:#ef4444}
+
+/* LAYOUT  */
+.app{display:flex;min-height:calc(100vh - 60px)}
+.sidebar{width:260px;background:var(--sidebar);border-right:1px solid var(--border);
+         padding:22px 16px;position:sticky;top:60px;height:calc(100vh - 60px);
+         overflow-y:auto;flex-shrink:0}
+.content{flex:1;padding:28px;overflow-y:auto;min-width:0}
+
+/* SIDEBAR ───*/
+.sidebar-section{margin-bottom:28px}
+.sidebar-label{font-size:.7rem;font-weight:600;color:var(--muted);
+               letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px;padding:0 8px}
+.sidebar-btn{display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;
+             background:transparent;border:none;border-radius:var(--r-sm);
+             color:var(--text);font-size:.875rem;font-family:'Poppins',sans-serif;
+             cursor:pointer;transition:all .18s;text-align:left;font-weight:500}
+.sidebar-btn:hover{background:var(--primary-l);color:var(--primary)}
+.sidebar-btn.active{background:var(--primary);color:#fff}
+.sidebar-btn .icon{font-size:1.1rem;width:22px;text-align:center}
+
+.trip-card-mini{background:linear-gradient(135deg,var(--primary),var(--accent));
+                border-radius:var(--r-sm);padding:14px;color:#fff;margin-bottom:10px;cursor:pointer}
+.trip-card-mini h4{font-size:.875rem;font-weight:600;margin-bottom:3px}
+.trip-card-mini p{font-size:.75rem;opacity:.85}
+.no-trips{text-align:center;color:var(--muted);font-size:.825rem;padding:16px 0}
+.no-trips .no-icon{font-size:2rem;margin-bottom:8px}
+
+/* TOP BAR / GREETING ─ */
+.greeting{margin-bottom:26px}
+.greeting h1{font-size:1.6rem;font-weight:700;margin-bottom:4px}
+.greeting p{color:var(--muted);font-size:.9rem}
+.greeting em{color:var(--primary);font-style:normal}
+
+/* PANELS  */
+.panel{display:none}
+.panel.active{display:block}
+
+/* PLANNER FORM CARD */
+.form-card{background:var(--card);border-radius:var(--radius);padding:28px;
+           box-shadow:var(--shadow);margin-bottom:24px}
+.form-card h2{font-size:1.2rem;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.form-card .desc{color:var(--muted);font-size:.85rem;margin-bottom:22px}
+
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.form-grid.three{grid-template-columns:1fr 1fr 1fr}
+@media(max-width:700px){.form-grid,.form-grid.three{grid-template-columns:1fr}}
+
+.fg{display:flex;flex-direction:column;gap:6px}
+.fg label{font-size:.78rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.fg input,.fg select{padding:11px 14px;border:1.5px solid var(--border);border-radius:var(--r-sm);
+                      font-family:'Poppins',sans-serif;font-size:.9rem;color:var(--text);
+                      background:#fff;outline:none;transition:border-color .2s,box-shadow .2s}
+.fg input:focus,.fg select:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+.fg.full{grid-column:1/-1}
+
+/* interests checkboxes */
+.interests-grid{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+.interest-chip{display:flex;align-items:center;gap:6px;padding:7px 13px;border:1.5px solid var(--border);
+               border-radius:20px;cursor:pointer;font-size:.82rem;transition:all .18s;user-select:none}
+.interest-chip:hover{border-color:var(--primary);background:var(--primary-l)}
+.interest-chip input{
+  position:absolute;opacity:0;width:0;height:0;pointer-events:none
+}
+.interest-chip.selected{background:var(--primary);color:#fff;border-color:var(--primary)}
+
+.generate-btn{margin-top:20px;padding:13px 32px;background:linear-gradient(135deg,var(--primary),var(--accent));
+              border:none;border-radius:var(--r-sm);color:#fff;font-family:'Poppins',sans-serif;
+              font-size:.95rem;font-weight:600;cursor:pointer;transition:opacity .2s,transform .15s;
+              display:flex;align-items:center;gap:9px}
+.generate-btn:hover{opacity:.92;transform:translateY(-1px)}
+.generate-btn:disabled{opacity:.55;cursor:not-allowed;transform:none}
+
+/* City choices */
+.city-explorer{display:none;margin-top:16px;padding:18px;background:var(--primary-l);border-radius:var(--r-sm)}
+.city-explorer.show{display:block}
+.city-explorer-title{font-size:.9rem;font-weight:600;color:var(--text);margin-bottom:12px}
+.city-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
+.city-card{background:#fff;border:1.5px solid var(--border);border-radius:var(--r-sm);padding:14px;text-align:left;cursor:pointer;font-family:'Poppins',sans-serif;transition:border-color .2s,transform .2s}
+.city-card:hover,.city-card.selected{border-color:var(--primary);transform:translateY(-2px)}
+.city-card h3{font-size:1rem;margin-bottom:4px}.city-card p{font-size:.78rem;color:var(--muted);line-height:1.5;margin-bottom:9px}
+.city-tags{display:flex;flex-wrap:wrap;gap:5px}.city-tag{font-size:.68rem;padding:3px 7px;border-radius:10px;background:var(--primary-l);color:var(--primary-d)}
+.city-attractions{font-size:.74rem;color:var(--muted);margin-top:9px}
+.explore-btn{margin-top:10px;padding:9px 14px;border:0;border-radius:var(--r-sm);background:var(--primary);color:#fff;font-family:'Poppins',sans-serif;font-weight:600;cursor:pointer}
+
+/* LOADING ───*/
+.loading-overlay{display:none;text-align:center;padding:60px 20px}
+.loading-overlay.show{display:block}
+.spinner{width:52px;height:52px;border:4px solid var(--primary-l);
+         border-top-color:var(--primary);border-radius:50%;
+         animation:spin .8s linear infinite;margin:0 auto 16px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-text{color:var(--muted);font-size:.9rem}
+.loading-dots::after{content:'.';animation:dots 1.4s steps(4,end) infinite}
+@keyframes dots{0%,20%{content:'.'}40%{content:'..'}60%{content:'...'}80%,100%{content:''}}
+
+/* ERROR ─ */
+.error-box{background:#fef2f2;border:1px solid #fca5a5;border-radius:var(--r-sm);
+           padding:14px 18px;color:#b91c1c;font-size:.875rem;display:none;margin-top:12px}
+.error-box.show{display:block}
+
+/* ITINERARY RESULT ─*/
+#itineraryResult{display:none}
+#itineraryResult.show{display:block}
+
+.trip-hero{background:linear-gradient(135deg,var(--primary) 0%,var(--accent) 100%);
+           border-radius:var(--radius);padding:28px 32px;color:#fff;margin-bottom:22px;
+           display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px}
+.trip-hero h2{font-size:1.7rem;font-weight:700;margin-bottom:6px}
+.trip-hero .overview{font-size:.9rem;opacity:.9;max-width:600px;line-height:1.6}
+.trip-hero-meta{display:flex;gap:20px;flex-wrap:wrap;margin-top:12px}
+.meta-item{background:rgba(255,255,255,.18);border-radius:20px;padding:5px 14px;
+           font-size:.8rem;display:flex;align-items:center;gap:6px}
+.trip-actions{display:flex;gap:10px;flex-shrink:0;flex-wrap:wrap}
+.btn-outline-white{padding:9px 18px;border:1.5px solid rgba(255,255,255,.6);
+                   border-radius:var(--r-sm);background:transparent;color:#fff;
+                   font-family:'Poppins',sans-serif;font-size:.82rem;font-weight:500;
+                   cursor:pointer;transition:all .2s}
+.btn-outline-white:hover{background:rgba(255,255,255,.15)}
+
+/* budget cards */
+.budget-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:22px}
+.budget-card{background:var(--card);border-radius:var(--r-sm);padding:16px;
+             box-shadow:var(--shadow);border-left:4px solid var(--primary);text-align:center}
+.budget-card .b-icon{font-size:1.4rem;margin-bottom:6px}
+.budget-card .b-label{font-size:.72rem;color:var(--muted);text-transform:uppercase;
+                       letter-spacing:.07em;font-weight:600;margin-bottom:4px}
+.budget-card .b-value{font-size:.95rem;font-weight:700;color:var(--text)}
+
+/* tabs */
+.tabs{display:flex;gap:4px;background:var(--card);border-radius:var(--r-sm);padding:5px;
+      box-shadow:var(--shadow);margin-bottom:22px;flex-wrap:wrap}
+.tab-btn{flex:1;min-width:100px;padding:9px 16px;border:none;border-radius:6px;background:transparent;
+         font-family:'Poppins',sans-serif;font-size:.82rem;font-weight:500;color:var(--muted);
+         cursor:pointer;transition:all .18s}
+.tab-btn.active{background:var(--primary);color:#fff;box-shadow:0 2px 8px rgba(37,99,235,.3)}
+
+.tab-pane{display:none}
+.tab-pane.active{display:block}
+
+/* day cards */
+.day-card{background:var(--card);border-radius:var(--radius);padding:22px;
+          box-shadow:var(--shadow);margin-bottom:16px;border-top:3px solid var(--primary)}
+.day-header{display:flex;align-items:center;gap:12px;margin-bottom:18px;flex-wrap:wrap}
+.day-badge{background:var(--primary);color:#fff;border-radius:20px;
+           padding:4px 14px;font-size:.78rem;font-weight:600}
+.day-theme{font-size:1rem;font-weight:700}
+.day-tip{background:#fffbeb;border:1px solid #fde68a;border-radius:6px;
+         padding:9px 13px;font-size:.82rem;color:#92400e;margin-top:14px;display:flex;gap:8px}
+
+.time-slots{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px}
+@media(max-width:600px){.time-slots{grid-template-columns:1fr}}
+.slot{border-radius:var(--r-sm);padding:14px;border:1px solid var(--border)}
+.slot.morning{background:#fffbeb;border-color:#fde68a}
+.slot.afternoon{background:#eff6ff;border-color:#bfdbfe}
+.slot.evening{background:#f5f3ff;border-color:#ddd6fe}
+.slot-time{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;
+           color:var(--muted);margin-bottom:6px;display:flex;align-items:center;gap:5px}
+.slot-activity{font-weight:600;font-size:.88rem;margin-bottom:5px}
+.slot-desc{font-size:.8rem;color:var(--muted);line-height:1.5;margin-bottom:8px}
+.slot-meta{display:flex;gap:8px;flex-wrap:wrap}
+.slot-tag{background:rgba(0,0,0,.05);border-radius:20px;padding:2px 10px;font-size:.74rem;color:var(--muted)}
+
+.meals-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:12px}
+@media(max-width:600px){.meals-row{grid-template-columns:1fr}}
+.meal-item{background:#f8fafc;border-radius:var(--r-sm);padding:10px 12px;border:1px solid var(--border)}
+.meal-label{font-size:.7rem;font-weight:700;color:var(--muted);text-transform:uppercase;
+            letter-spacing:.07em;margin-bottom:4px}
+.meal-name{font-size:.82rem;font-weight:500}
+
+/* packing list */
+.packing-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+.pack-section{background:var(--card);border-radius:var(--r-sm);padding:16px;box-shadow:var(--shadow)}
+.pack-title{font-size:.82rem;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:7px}
+.pack-item{display:flex;align-items:center;gap:9px;padding:6px 0;border-bottom:1px solid var(--border);
+           font-size:.83rem;cursor:pointer}
+.pack-item:last-child{border-bottom:none}
+.pack-check{width:16px;height:16px;border:2px solid var(--border);border-radius:3px;
+            flex-shrink:0;transition:all .15s;display:flex;align-items:center;justify-content:center}
+.pack-item.done .pack-check{background:var(--green);border-color:var(--green);color:#fff;font-size:10px}
+.pack-item.done span{text-decoration:line-through;color:var(--muted)}
+
+/* tips */
+.tips-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.tip-card{background:var(--card);border-radius:var(--r-sm);padding:16px;
+          box-shadow:var(--shadow);border-left:3px solid var(--accent);display:flex;gap:12px;align-items:flex-start}
+.tip-icon{font-size:1.3rem;flex-shrink:0}
+.tip-text{font-size:.84rem;line-height:1.6}
+
+.info-card{background:var(--card);border-radius:var(--r-sm);padding:16px;
+           box-shadow:var(--shadow);margin-bottom:12px}
+.info-card h4{font-size:.9rem;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:7px}
+.info-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);font-size:.85rem}
+.info-row:last-child{border-bottom:none}
+.info-row strong{color:var(--muted);font-weight:500}
+
+.foods-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.food-chip{background:var(--primary-l);color:var(--primary);border-radius:20px;padding:5px 13px;font-size:.82rem;font-weight:500}
+
+/* CHAT PANEL */
+.chat-wrap{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);
+           display:flex;flex-direction:column;height:calc(100vh - 200px);min-height:400px}
+.chat-header{padding:16px 20px;border-bottom:1px solid var(--border);
+             display:flex;align-items:center;gap:10px}
+.chat-header .bot-icon{width:36px;height:36px;background:linear-gradient(135deg,var(--primary),var(--accent));
+                        border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px}
+.chat-header h3{font-size:.95rem;font-weight:700}
+.chat-header p{font-size:.78rem;color:var(--muted)}
+.online-dot{width:8px;height:8px;background:var(--green);border-radius:50%;margin-left:auto}
+
+.chat-messages{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:14px}
+.chat-msg{max-width:80%;display:flex;flex-direction:column;gap:4px}
+.chat-msg.user{align-self:flex-end;align-items:flex-end}
+.chat-msg.bot{align-self:flex-start;align-items:flex-start}
+.bubble{padding:11px 16px;border-radius:16px;font-size:.875rem;line-height:1.6}
+.user .bubble{background:var(--primary);color:#fff;border-bottom-right-radius:4px}
+.bot .bubble{background:#f1f5f9;color:var(--text);border-bottom-left-radius:4px}
+.msg-time{font-size:.7rem;color:var(--muted)}
+.typing .bubble{background:#f1f5f9}
+.typing-dots{display:flex;gap:4px;align-items:center;padding:4px 0}
+.typing-dot{width:7px;height:7px;background:var(--muted);border-radius:50%;animation:bounce .8s ease-in-out infinite}
+.typing-dot:nth-child(2){animation-delay:.15s}
+.typing-dot:nth-child(3){animation-delay:.3s}
+@keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
+
+.chat-suggestions{padding:10px 20px;display:flex;gap:8px;flex-wrap:wrap;border-top:1px solid var(--border)}
+.suggest-btn{padding:6px 13px;background:var(--primary-l);color:var(--primary);border:none;
+             border-radius:20px;font-size:.78rem;cursor:pointer;font-family:'Poppins',sans-serif;
+             transition:background .18s}
+.suggest-btn:hover{background:#bfdbfe}
+
+.chat-input-row{padding:14px 16px;border-top:1px solid var(--border);display:flex;gap:10px}
+.chat-input-row input{flex:1;padding:11px 16px;border:1.5px solid var(--border);border-radius:20px;
+                       font-family:'Poppins',sans-serif;font-size:.875rem;outline:none;
+                       transition:border-color .2s}
+.chat-input-row input:focus{border-color:var(--primary)}
+.chat-send{width:42px;height:42px;background:var(--primary);border:none;border-radius:50%;
+           color:#fff;font-size:1.1rem;cursor:pointer;transition:background .2s;flex-shrink:0}
+.chat-send:hover{background:var(--primary-d)}
+
+/* PRINT STYLES  */
+@media print{
+  .navbar,.sidebar,.chat-wrap,.generate-btn,.trip-actions,.tabs{display:none!important}
+  .content{padding:0}
+  #itineraryResult{display:block!important}
+  .tab-pane{display:block!important}
+}
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="nav-brand"> 
+    <span class="nav-title">Plan<span>Go</span></span>
+  </div>
+  <div class="nav-right">
+    <div class="nav-user">
+      <div class="avatar" id="userAvatar">?</div>
+      <span id="navUserName">User</span>
+    </div>
+    <button class="nav-logout" onclick="window.location.href='/logout'">Logout</button>
+  </div>
+</nav>
+
+<div class="app">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Navigation</div>
+      <button class="sidebar-btn active" onclick="showPanel('planner',this)">
+        <span class="icon"></span>Planner
+      </button>
+      <button class="sidebar-btn" onclick="showPanel('chat',this)">
+        <span class="icon"></span>Chat
+      </button>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">My Trips</div>
+      <div id="savedTripsList">
+        <div class="no-trips"><div class="no-icon">🌍</div><p>No trips yet.<br/>Plan one!</p></div>
+      </div>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Quick Links</div>
+      <button class="sidebar-btn" onclick="window.open('https://www.irctc.co.in','_blank')">
+        <span class="icon"></span> IRCTC Trains
+      </button>
+      <button class="sidebar-btn" onclick="window.open('https://www.goindigo.in','_blank')">
+        <span class="icon"></span> IndiGo Flights
+      </button>
+      <button class="sidebar-btn" onclick="window.open('https://www.makemytrip.com','_blank')">
+        <span class="icon"></span> MakeMyTrip
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="content">
+
+    <!-- PLANNER PANEL  -->
+    <div class="panel active" id="panel-planner">
+      <div class="greeting">
+        <h1>Hello, <em id="greetName">Traveler</em>! </h1>
+        <p>Where do you want to go today? Let AI plan your perfect trip.</p>
+      </div>
+
+      <!-- Form -->
+      <div class="form-card">
+        <h2> Plan a New Trip</h2>
+        <p class="desc">Fill in your details and our AI will generate a complete personalized itinerary.</p>
+
+        <div class="form-grid">
+          <div class="fg full">
+            <label>State or Destination *</label>
+            <input type="text" id="destination" placeholder="For India, enter a state such as Rajasthan"/>
+            <button type="button" class="explore-btn" onclick="loadCitiesForState()">Explore cities and attractions</button>
+          </div>
+          <div class="fg">
+            <label>Number of Days *</label>
+            <input type="number" id="days" value="3" min="1" max="14"/>
+          </div>
+          <div class="fg">
+            <label>Budget Level</label>
+            <select id="budget">
+              <option value="budget"> Budget / Backpacker</option>
+              <option value="moderate" selected> Moderate</option>
+              <option value="luxury"> Luxury</option>
+            </select>
+          </div>
+          <div class="fg">
+  <label>Currency</label>
+  <select id="currency">
+    <option value="INR" selected>INR (₹)</option>
+    <option value="USD">USD ($)</option>
+    <option value="EUR">EUR (€)</option>
+    <option value="GBP">GBP (£)</option>
+  </select>
+</div>
+          <div class="fg">
+            <label>Travel Style</label>
+            <select id="travel_style">
+              <option value="relaxed"> Relaxed & Slow</option>
+              <option value="balanced" selected> Balanced</option>
+              <option value="action-packed"> Action-Packed</option>
+              <option value="cultural"> Cultural Immersion</option>
+              <option value="adventure"> Adventure</option>
+            </select>
+          </div>
+          <div class="fg">
+            </select>
+          </div>
+        </div>
+
+        <div class="city-explorer" id="cityExplorer">
+          <div class="city-explorer-title" id="cityExplorerTitle">Choose a city</div>
+          <div class="city-grid" id="cityGrid"></div>
+        </div>
+
+        <div class="fg" style="margin-top:16px">
+          <label>Interests (select all that apply)</label>
+          <div class="interests-grid">
+            <label class="interest-chip"><input type="checkbox" value="history">  History & Culture</label>
+            <label class="interest-chip"><input type="checkbox" value="food">  Food & Cuisine</label>
+            <label class="interest-chip"><input type="checkbox" value="adventure">  Adventure</label>
+            <label class="interest-chip"><input type="checkbox" value="nature">  Nature</label>
+            <label class="interest-chip"><input type="checkbox" value="shopping">  Shopping</label>
+            <label class="interest-chip"><input type="checkbox" value="nightlife">  Nightlife</label>
+            <label class="interest-chip"><input type="checkbox" value="beaches">  Beaches</label>
+            <label class="interest-chip"><input type="checkbox" value="photography">  Photography</label>
+          </div>
+        </div>
+
+        <button class="generate-btn" id="generateBtn" onclick="generateItinerary()">
+          <span></span> Generate AI Itinerary
+        </button>
+        <div class="error-box" id="formError"></div>
+      </div>
+
+      <!-- Loading -->
+      <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+        <p style="font-weight:600;font-size:1rem;margin-bottom:6px">Generating your itinerary<span class="loading-dots"></span></p>
+        <p class="loading-text">Our AI is crafting the perfect trip for you </p>
+      </div>
+
+      <!-- Result -->
+      <div id="itineraryResult">
+
+        <!-- Hero -->
+        <div class="trip-hero" id="tripHero">
+          <div>
+            <h2 id="rDestination">Destination</h2>
+            <p class="overview" id="rOverview"></p>
+            <div class="trip-hero-meta" id="rMeta"></div>
+          </div>
+          <div class="trip-actions">
+            <button class="btn-outline-white" onclick="window.print()"> Print</button>
+            <button class="btn-outline-white" onclick="saveTrip()"> Save</button>
+            <button class="btn-outline-white" onclick="shareTrip()"> Share</button>
+          </div>
+        </div>
+
+        <!-- Budget -->
+        <div class="budget-grid" id="budgetGrid"></div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+          <button class="tab-btn active" onclick="switchTab('days',this)"> Day-by-Day</button>
+          <button class="tab-btn" onclick="switchTab('packing',this)"> Packing List</button>
+          <button class="tab-btn" onclick="switchTab('tips',this)"> Tips & Info</button>
+        </div>
+
+        <!-- Days Pane -->
+        <div class="tab-pane active" id="tab-days" id="daysPane"></div>
+
+        <!-- Packing Pane -->
+        <div class="tab-pane" id="tab-packing"></div>
+
+        <!-- Tips Pane -->
+        <div class="tab-pane" id="tab-tips"></div>
+
+      </div><!-- /itineraryResult -->
+    </div><!-- /panel-planner -->
+
+    <!-- CHAT PANEL ─-->
+    <div class="panel" id="panel-chat">
+      <div class="greeting">
+        <h1> AI Travel Assistant</h1>
+        <p>Ask anything about your trip — destinations, tips, food, safety, and more.</p>
+      </div>
+      <div class="chat-wrap">
+        <div class="chat-header">
+          <div class="bot-icon"></div>
+          <div>
+            <h3>PlanGo AI</h3>
+            <p>Powered by Gemini</p>
+          </div>
+          <div class="online-dot"></div>
+        </div>
+        <div class="chat-messages" id="chatMessages">
+          <div class="chat-msg bot">
+            <div class="bubble"> Hi! I'm PlanGo AI, your personal travel assistant.<br/>Ask me anything — best destinations, local tips, budget advice, visa info, or anything travel related!</div>
+            <span class="msg-time">Just now</span>
+          </div>
+        </div>
+        <div class="chat-suggestions">
+          <button class="suggest-btn" onclick="sendSuggestion(this)">Best time to visit ?</button>
+          <button class="suggest-btn" onclick="sendSuggestion(this)">Budget trip to Europe</button>
+          <button class="suggest-btn" onclick="sendSuggestion(this)">Visa tips for Indians</button>
+          <button class="suggest-btn" onclick="sendSuggestion(this)">Best street food cities</button>
+        </div>
+        <div class="chat-input-row">
+          <input type="text" id="chatInput" placeholder="Ask about any destination…" onkeydown="if(event.key==='Enter')sendChat()"/>
+          <button class="chat-send" onclick="sendChat()">➤</button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+// Init 
+const USER_NAME  = "{{ user_name }}";
+const USER_EMAIL = "{{ user_email }}";
+let currentItinerary = null;
+let savedTrips = JSON.parse(localStorage.getItem('plango_trips') || '[]');
+
+document.getElementById('greetName').textContent   = USER_NAME.split(' ')[0];
+document.getElementById('navUserName').textContent = USER_NAME;
+document.getElementById('userAvatar').textContent  = USER_NAME.charAt(0).toUpperCase();
+renderSavedTrips();
+
+// Panel / Tab switching ─
+function showPanel(name, btn) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+  if (btn) btn.classList.add('active');
+}
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  btn.classList.add('active');
+}
+
+// Interest chips toggle — use checkbox change event to avoid double-fire
+document.querySelectorAll('.interest-chip input[type="checkbox"]').forEach(function(cb) {
+  cb.addEventListener('change', function() {
+    cb.closest('.interest-chip').classList.toggle('selected', cb.checked);
+  });
+});
+
+function escapeHtml(value) {
+  return String(value).replace(/[&<>'"]/g, character => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+  })[character]);
+}
+
+async function loadCitiesForState() {
+  const state = document.getElementById('destination').value.trim();
+  const explorer = document.getElementById('cityExplorer');
+  const grid = document.getElementById('cityGrid');
+  const title = document.getElementById('cityExplorerTitle');
+
+  if (!state) { showErr('Enter an Indian state first, for example Rajasthan.'); return; }
+
+  grid.innerHTML = '';
+  explorer.classList.add('show');
+  title.textContent = 'Loading cities in ' + state + '…';
+
+  try {
+    const response = await fetch('/api/cities-for-state?state=' + encodeURIComponent(state));
+    const data = await response.json();
+    if (!response.ok || !data.success) throw new Error(data.error || 'Could not load city information.');
+
+    title.textContent = 'Choose where to go in ' + data.state;
+    if (!data.cities.length) {
+      grid.innerHTML = '<p class="city-attractions">No cities have been imported for this state yet.</p>';
+      return;
+    }
+
+    grid.innerHTML = data.cities.map(city => {
+      const encodedName = encodeURIComponent(city.name).replace(/'/g, '%27');
+      return `<button type="button" class="city-card" onclick="selectCity('${encodedName}', this)">
+        <h3>${escapeHtml(city.name)}</h3>
+        <p>${escapeHtml(city.description)}</p>
+        <div class="city-tags">${city.specialties.map(item => `<span class="city-tag">${escapeHtml(item)}</span>`).join('')}</div>
+        <div class="city-attractions"><strong>Top attractions:</strong> ${city.attractions.map(escapeHtml).join(', ') || 'To be added'}</div>
+      </button>`;
+    }).join('');
+  } catch (error) {
+    explorer.classList.remove('show');
+    showErr(error.message || 'Could not load city information.');
+  }
+}
+
+function selectCity(encodedName, card) {
+  const cityName = decodeURIComponent(encodedName);
+  document.getElementById('destination').value = cityName;
+  document.querySelectorAll('.city-card').forEach(item => item.classList.remove('selected'));
+  card.classList.add('selected');
+  document.getElementById('cityExplorerTitle').textContent = cityName + ' selected. Generate your itinerary when ready.';
+}
+
+// Generate Itinerary 
+async function generateItinerary() {
+  const dest = document.getElementById('destination').value.trim();
+  const days = parseInt(document.getElementById('days').value);
+  const errBox = document.getElementById('formError');
+  errBox.classList.remove('show');
+
+  if (!dest) { showErr('Please enter a destination.'); return; }
+  if (!days || days < 1 || days > 14) { showErr('Days must be between 1 and 14.'); return; }
+
+  const interests = [...document.querySelectorAll('.interest-chip.selected input')]
+                    .map(i => i.value);
+
+  const payload = {
+    destination: dest,
+    days,
+    budget:       document.getElementById('budget').value,
+    travel_style: document.getElementById('travel_style').value,
+    currency:     document.getElementById('currency').value,
+    interests
+  };
+
+  document.getElementById('generateBtn').disabled = true;
+  document.getElementById('loadingOverlay').classList.add('show');
+  document.getElementById('itineraryResult').classList.remove('show');
+
+  try {
+    const res  = await fetch('/api/generate-itinerary', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(payload)
+    });
+    const contentType = res.headers.get('content-type') || '';
+    if (!contentType.includes('application/json')) {
+      throw new Error('The server returned an unexpected response. Check the Flask terminal for details.');
+    }
+    const data = await res.json();
+
+    if (res.ok && data.success) {
+      currentItinerary = data.itinerary;
+      renderItinerary(data.itinerary);
+    } else {
+      showErr(data.error || 'Something went wrong. Please try again.');
+    }
+  } catch(e) {
+    showErr(e.message || 'Network error. Please check your connection.');
+  } finally {
+    document.getElementById('generateBtn').disabled = false;
+    document.getElementById('loadingOverlay').classList.remove('show');
+  }
+}
+
+function showErr(msg) {
+  const b = document.getElementById('formError');
+  b.textContent = ' ' + msg;
+  b.classList.add('show');
+}
+
+// Render Itinerary 
+function renderItinerary(it) {
+  const cur = document.getElementById('currency').value;
+  const sym = cur === 'INR' ? '₹' : cur === 'EUR' ? '€' : cur === 'GBP' ? '£' : '$';
+  const slotIcons = {morning: '🌅', afternoon: '☀️', evening: '🌙'};
+
+  // Hero
+  document.getElementById('rDestination').textContent = '📍 ' + it.destination;
+  document.getElementById('rOverview').textContent    = it.overview || '';
+  document.getElementById('rMeta').innerHTML = `
+    <div class="meta-item"> ${it.duration} Days</div>
+    <div class="meta-item"> ${it.estimated_budget?.total || 'See budget'}</div>
+    <div class="meta-item"> ${it.weather_info || it.best_time_to_visit || ''}</div>`;
+
+  // Budget
+  const b = it.estimated_budget || {};
+  document.getElementById('budgetGrid').innerHTML = [
+    {icon:'',label:'Accommodation',val:b.accommodation},
+    {icon:'',label:'Food / Day',   val:b.food},
+    {icon:'',label:'Activities',   val:b.activities},
+    {icon:'',label:'Transport',    val:b.transport},
+    {icon:'',label:'TOTAL',        val:b.total}
+  ].map(x=>`<div class="budget-card"><div class="b-icon">${x.icon}</div>
+    <div class="b-label">${x.label}</div>
+    <div class="b-value">${x.val||'—'}</div></div>`).join('');
+
+  // Days
+  document.getElementById('tab-days').innerHTML = (it.days||[]).map(day=>`
+    <div class="day-card">
+      <div class="day-header">
+        <span class="day-badge">Day ${day.day}</span>
+        <span class="day-theme">${day.theme||''}</span>
+      </div>
+      <div class="time-slots">
+        ${['morning','afternoon','evening'].map(t=>{
+          const s=day[t]||{};
+          return `<div class="slot ${t}">
+            <div class="slot-time">${slotIcons[t]} ${t.charAt(0).toUpperCase()+t.slice(1)}</div>
+            <div class="slot-activity">${s.activity||'—'}</div>
+            <div class="slot-desc">${s.description||''}</div>
+            <div class="slot-meta">
+              <span class="slot-tag">⏱ ${s.duration||''}</span>
+              <span class="slot-tag">${sym} ${String(s.cost || '').replace(/[$€£₹]/g,'')}</span>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
+      <div class="meals-row">
+        ${['breakfast','lunch','dinner'].map(m=>`
+          <div class="meal-item">
+            <div class="meal-label">${m==='breakfast'?'':m==='lunch'?'🌞':'🌛'} ${m}</div>
+            <div class="meal-name">${(day.meals||{})[m]||'—'}</div>
+          </div>`).join('')}
+      </div>
+      ${day.tips?`<div class="day-tip"><span>💡</span><span>${day.tips}</span></div>`:''}
+    </div>`).join('');
+
+  // Packing
+  const pl = it.packing_list || {};
+  const packIcons = {essentials:'🎒',clothing:'👕',tech:'📱',health:'💊',documents:'📄'};
+  document.getElementById('tab-packing').innerHTML = `
+    <div class="packing-grid">
+      ${Object.entries(pl).map(([cat,items])=>`
+        <div class="pack-section">
+          <div class="pack-title">${packIcons[cat]||'📦'} ${cat.charAt(0).toUpperCase()+cat.slice(1)}</div>
+          ${(items||[]).map(item=>`
+            <div class="pack-item" onclick="togglePack(this)">
+              <div class="pack-check"></div>
+              <span>${item}</span>
+            </div>`).join('')}
+        </div>`).join('')}
+    </div>`;
+
+  // Tips
+  const tipIcons = ['🗺️','🛡️','📱','💡','🤝'];
+  document.getElementById('tab-tips').innerHTML = `
+    <div class="tips-grid" style="margin-bottom:20px">
+      ${(it.local_tips||[]).map((t,i)=>`
+        <div class="tip-card">
+          <div class="tip-icon">${tipIcons[i%tipIcons.length]}</div>
+          <div class="tip-text">${t}</div>
+        </div>`).join('')}
+    </div>
+    ${it.must_try_foods ? `
+      <div class="info-card">
+        <h4>🍜 Must-Try Foods</h4>
+        <div class="foods-row">
+          ${it.must_try_foods.map(f=>`<span class="food-chip">${f}</span>`).join('')}
+        </div>
+      </div>` : ''}
+    <div class="info-card">
+      <h4>🆘 Emergency Information</h4>
+      ${Object.entries(it.emergency_info||{}).map(([k,v])=>`
+        <div class="info-row"><strong>${k.replace(/_/g,' ')}</strong><span>${v}</span></div>`).join('')}
+    </div>
+    <div class="info-card">
+      <h4>🗓️ Best Time to Visit</h4>
+      <p style="font-size:.875rem;line-height:1.6;color:var(--muted)">${it.best_time_to_visit||'—'}</p>
+    </div>`;
+
+  document.getElementById('itineraryResult').classList.add('show');
+  document.getElementById('itineraryResult').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+// Packing check toggle ──
+function togglePack(el) {
+  el.classList.toggle('done');
+  el.querySelector('.pack-check').textContent = el.classList.contains('done') ? '✓' : '';
+}
+
+// Save & Share 
+function saveTrip() {
+  if (!currentItinerary) return;
+  const exists = savedTrips.find(t => t.destination === currentItinerary.destination);
+  if (!exists) {
+    savedTrips.push({ destination: currentItinerary.destination, duration: currentItinerary.duration, date: new Date().toLocaleDateString() });
+    localStorage.setItem('plango_trips', JSON.stringify(savedTrips));
+    renderSavedTrips();
+  }
+  alert('✅ Trip saved to My Trips!');
+}
+function shareTrip() {
+  if (!currentItinerary) return;
+  const text = `✈️ ${currentItinerary.destination} – ${currentItinerary.duration} day trip\n\n${currentItinerary.overview}\n\nPlanned with PlanGo AI 🌍`;
+  if (navigator.share) { navigator.share({ title: 'My Trip Plan', text }); }
+  else { navigator.clipboard.writeText(text); alert('📋 Trip summary copied to clipboard!'); }
+}
+function renderSavedTrips() {
+  const el = document.getElementById('savedTripsList');
+  if (!savedTrips.length) { el.innerHTML = '<div class="no-trips"><div class="no-icon">🌍</div><p>No trips yet.<br/>Plan one!</p></div>'; return; }
+  el.innerHTML = savedTrips.map(t=>`
+    <div class="trip-card-mini">
+      <h4>📍 ${t.destination}</h4>
+      <p>${t.duration} days · ${t.date}</p>
+    </div>`).join('');
+}
+
+// AI Chat ───
+async function sendChat() {
+  const input = document.getElementById('chatInput');
+  const msg = input.value.trim();
+  if (!msg) return;
+  input.value = '';
+  appendMsg('user', msg);
+  const typing = appendTyping();
+  const context = currentItinerary ? `Planning trip to ${currentItinerary.destination} for ${currentItinerary.duration} days` : '';
+  try {
+    const res  = await fetch('/api/chat', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ message: msg, context })
+    });
+    const data = await res.json();
+    typing.remove();
+    appendMsg('bot', data.success ? data.reply : '⚠️ Sorry, I encountered an error. Please try again.');
+  } catch(e) {
+    typing.remove();
+    appendMsg('bot', '⚠️ Network error. Please check your connection.');
+  }
+}
+function sendSuggestion(btn) {
+  document.getElementById('chatInput').value = btn.textContent;
+  sendChat();
+}
+function appendMsg(role, text) {
+  const wrap = document.getElementById('chatMessages');
+  const div  = document.createElement('div');
+  div.className = `chat-msg ${role}`;
+  const time = new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+  div.innerHTML = `<div class="bubble">${text.replace(/\n/g,'<br/>')}</div><span class="msg-time">${time}</span>`;
+  wrap.appendChild(div);
+  wrap.scrollTop = wrap.scrollHeight;
+  return div;
+}
+function appendTyping() {
+  const wrap = document.getElementById('chatMessages');
+  const div  = document.createElement('div');
+  div.className = 'chat-msg bot typing';
+  div.innerHTML = `<div class="bubble"><div class="typing-dots"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div></div>`;
+  wrap.appendChild(div);
+  wrap.scrollTop = wrap.scrollHeight;
+  return div;
+}
+</script>
+</body>
+</html>

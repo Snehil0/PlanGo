@@ -1,0 +1,13 @@
+city_name,state_name,name,category,description,latitude,longitude,opening_time,closing_time,average_visit_duration,entry_fee,rating,image_url
+Jaipur,Rajasthan,Amber Fort,History,Historic hill fort with palace courtyards and views.,26.9855,75.8513,08:00,17:30,180,,4.6,
+Jaipur,Rajasthan,Hawa Mahal,Architecture,Iconic pink facade built for royal women to observe city life.,26.9239,75.8267,09:00,17:00,60,,4.5,
+Jaipur,Rajasthan,City Palace,History,Royal palace complex with museums and courtyards.,26.9258,75.8237,09:30,17:00,120,,4.5,
+Udaipur,Rajasthan,City Palace Udaipur,History,Palace complex overlooking Lake Pichola.,24.5764,73.6835,09:30,17:30,150,,4.5,
+Udaipur,Rajasthan,Lake Pichola,Nature,Scenic artificial freshwater lake with boat ride views.,24.5713,73.6793,,,90,,4.6,
+Udaipur,Rajasthan,Sajjangarh Palace,Photography,Hilltop monsoon palace with sunset and city views.,24.6010,73.6728,09:00,18:00,120,,4.4,
+Jaisalmer,Rajasthan,Jaisalmer Fort,History,Living sandstone fort above the old city.,26.9124,70.9126,09:00,17:00,150,,4.5,
+Jaisalmer,Rajasthan,Sam Sand Dunes,Adventure,Desert dunes known for sunset views and camel safaris.,26.8626,70.4966,,,180,,4.4,
+Jaisalmer,Rajasthan,Patwon Ki Haveli,Architecture,Cluster of ornate historic merchant houses.,26.9166,70.9104,09:00,17:00,60,,4.4,
+Jodhpur,Rajasthan,Mehrangarh Fort,History,Large hilltop fort with museums and views over the blue city.,26.2980,73.0180,09:00,17:00,180,,4.7,
+Jodhpur,Rajasthan,Jaswant Thada,Architecture,Marble memorial near Mehrangarh Fort.,26.3034,73.0218,09:00,17:00,60,,4.5,
+Jodhpur,Rajasthan,Clock Tower Market,Shopping,Historic market area for spices textiles and local handicrafts.,26.2953,73.0256,10:00,20:00,90,,4.3,
