@@ -1,6 +1,5 @@
 from flask import Flask, render_template, request, jsonify, session, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.engine import URL
 from werkzeug.security import generate_password_hash, check_password_hash
 from google import genai
 from dotenv import load_dotenv
@@ -15,16 +14,23 @@ if not app.secret_key:
 
 # Database Setup
 # Keep MySQL settings in .env so the password is not hardcoded in this file.
-database_url = URL.create(
-    drivername="mysql+pymysql",
-    username=os.getenv("MYSQL_USER", "root"),
-    password=os.getenv("MYSQL_PASSWORD", ""),
-    host=os.getenv("MYSQL_HOST", "localhost"),
-    database=os.getenv("MYSQL_DATABASE", "plango")
-)
-app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL", database_url)
+# Database Setup (Render PostgreSQL)
+database_url = os.getenv("DATABASE_URL")
+
+if not database_url:
+    raise RuntimeError("DATABASE_URL environment variable is not set.")
+
+# Render's DATABASE_URL may start with postgres://
+if database_url.startswith("postgres://"):
+    database_url = database_url.replace("postgres://", "postgresql://", 1)
+
+app.config["SQLALCHEMY_DATABASE_URI"] = database_url
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
 db = SQLAlchemy(app)
+# Create tables when the app starts
+with app.app_context():
+    db.create_all()
 
 # Gemini Setup (Updated for 2026 Model Availability)
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
