@@ -12,8 +12,6 @@ app.secret_key = os.getenv("FLASK_SECRET_KEY")
 if not app.secret_key:
     raise RuntimeError("FLASK_SECRET_KEY must be set in the .env file.")
 
-# Database Setup
-# Keep MySQL settings in .env so the password is not hardcoded in this file.
 # Database Setup (Render PostgreSQL)
 database_url = os.getenv("DATABASE_URL")
 
@@ -28,14 +26,6 @@ app.config["SQLALCHEMY_DATABASE_URI"] = database_url
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
-with app.app_context():
-    try:
-        print("Creating database tables...")
-        db.create_all()
-        print("Database tables created successfully!")
-    except Exception as e:
-        print("ERROR CREATING TABLES:", e)
-        raise
 
 # Gemini Setup (Updated for 2026 Model Availability)
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
@@ -46,6 +36,8 @@ MODEL = "gemini-2.5-flash"
 
 # Database Models
 class User(db.Model):
+    __tablename__ = "users"
+
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
@@ -140,7 +132,7 @@ class Restaurant(db.Model):
 
 class Trip(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     city_id = db.Column(db.Integer, db.ForeignKey("city.id"), nullable=False)
     trip_name = db.Column(db.String(150), nullable=False)
     days = db.Column(db.Integer, nullable=False)
@@ -152,10 +144,14 @@ class Trip(db.Model):
     city = db.relationship("City", back_populates="trips")
 
 
-def create_tables():
-    """Create database tables for Phase 1 if they do not already exist."""
-    with app.app_context():
+with app.app_context():
+    try:
+        print("Creating database tables...")
         db.create_all()
+        print("Database tables created successfully!")
+    except Exception as e:
+        print("ERROR CREATING TABLES:", e)
+        raise
 
 # Auth Routes
 @app.route("/")
@@ -325,5 +321,4 @@ def travel_chat():
 
 
 if __name__ == "__main__":
-    create_tables()
     app.run(debug=True, port=5000)
