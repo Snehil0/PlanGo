@@ -28,9 +28,14 @@ app.config["SQLALCHEMY_DATABASE_URI"] = database_url
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
-# Create tables when the app starts
 with app.app_context():
-    db.create_all()
+    try:
+        print("Creating database tables...")
+        db.create_all()
+        print("Database tables created successfully!")
+    except Exception as e:
+        print("ERROR CREATING TABLES:", e)
+        raise
 
 # Gemini Setup (Updated for 2026 Model Availability)
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
