@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PlanGo - Admin Dashboard</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"/>
+  <style>
+    .admin-page{max-width:1100px;margin:0 auto;padding:48px 24px 72px}
+    .admin-heading{margin-bottom:30px}.admin-heading h1{font-size:2rem;color:#fff;margin-bottom:8px}
+    .admin-heading p{color:var(--muted)}
+    .admin-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:36px}
+    .admin-stat{background:var(--card-bg);border:1px solid var(--border);border-radius:var(--radius);padding:22px}
+    .admin-stat p{color:var(--muted);font-size:.85rem;margin-bottom:8px}.admin-stat strong{font-size:2rem;color:#fff}
+    .admin-actions{background:var(--card-bg);border:1px solid var(--border);border-radius:var(--radius);padding:26px}
+    .admin-actions h2{font-size:1.15rem;color:#fff;margin-bottom:8px}.admin-actions p{color:var(--muted);font-size:.88rem;margin-bottom:18px}
+    .admin-action-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+    .admin-action{padding:12px 14px;background:rgba(108,99,255,.12);border:1px solid var(--border);border-radius:10px;
+                  color:#fff;font:inherit;text-align:left;cursor:not-allowed;opacity:.8}
+    .admin-action[href]{cursor:pointer;opacity:1;text-decoration:none}
+    .admin-import{cursor:pointer;opacity:1;width:100%}
+    .admin-message{padding:12px 14px;border-radius:8px;margin-bottom:18px;font-size:.88rem;white-space:pre-line}
+    .admin-message.success{background:rgba(67,233,123,.12);border:1px solid rgba(67,233,123,.35);color:#a7f3d0}
+    .admin-message.error{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.35);color:#fecaca}
+    .admin-back{color:#a89dff;text-decoration:none;font-size:.9rem}.admin-back:hover{text-decoration:underline}
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-container">
+      <div class="logo">PlanGo</div>
+      <ul class="nav-links">
+        <li><a class="admin-back" href="{{ url_for('planner') }}">Back to Planner</a></li>
+        <li><a class="btn-login" href="{{ url_for('logout') }}">Logout</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main class="admin-page">
+    <section class="admin-heading">
+      <h1>Admin Dashboard</h1>
+      <p>Welcome, {{ admin_name }}. This is a simple overview of PlanGo's travel data.</p>
+    </section>
+
+    <section class="admin-stats" aria-label="Database counts">
+      <div class="admin-stat"><p>Users</p><strong>{{ counts.users }}</strong></div>
+      <div class="admin-stat"><p>States</p><strong>{{ counts.states }}</strong></div>
+      <div class="admin-stat"><p>Cities</p><strong>{{ counts.cities }}</strong></div>
+      <div class="admin-stat"><p>Destinations</p><strong>{{ counts.destinations }}</strong></div>
+      <div class="admin-stat"><p>Attractions</p><strong>{{ counts.attractions }}</strong></div>
+    </section>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        <div class="admin-message {{ category }}">{{ message }}</div>
+      {% endfor %}
+    {% endwith %}
+
+    <section class="admin-actions">
+      <h2>Management Tools</h2>
+      <p>Manage the available travel data or import the project destination dataset.</p>
+      <div class="admin-action-grid">
+        <a class="admin-action" href="{{ url_for('manage_destinations') }}">Manage Destinations</a>
+        <a class="admin-action" href="{{ url_for('manage_cities') }}">Manage Cities</a>
+        <a class="admin-action" href="{{ url_for('manage_attractions') }}">Manage Attractions</a>
+        <form method="post" action="{{ url_for('admin_import_destinations') }}">
+          <button class="admin-action admin-import" type="submit">Import Travel Data</button>
+        </form>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

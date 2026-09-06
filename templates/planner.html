@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>PlanGo – Trip Planner</title>
+<title>PlanGo - Trip Planner</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 <style>
 /* RESET & BASE  */
@@ -26,6 +26,10 @@ body{font-family:'Poppins',sans-serif;background:var(--bg);color:var(--text);min
 .nav-logo{font-size:24px}
 .nav-title{font-size:1.4rem;font-weight:700;color:#fff;letter-spacing:-.02em}
 .nav-title span{color:#60a5fa}
+.sidebar-toggle{width:32px;height:32px;background:transparent;border:1px solid rgba(255,255,255,.2);
+                border-radius:6px;color:#fff;font-size:1.1rem;cursor:pointer;line-height:1;
+                transition:background .2s,border-color .2s}
+.sidebar-toggle:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.45)}
 .nav-right{display:flex;align-items:center;gap:12px}
 .nav-user{color:#94a3b8;font-size:.85rem;display:flex;align-items:center;gap:8px}
 .avatar{width:32px;height:32px;background:linear-gradient(135deg,var(--primary),var(--accent));
@@ -38,12 +42,19 @@ body{font-family:'Poppins',sans-serif;background:var(--bg);color:var(--text);min
 
 /* LAYOUT  */
 .app{display:flex;min-height:calc(100vh - 60px)}
-.sidebar{width:260px;background:var(--sidebar);border-right:1px solid var(--border);
-         padding:22px 16px;position:sticky;top:60px;height:calc(100vh - 60px);
-         overflow-y:auto;flex-shrink:0}
-.content{flex:1;padding:28px;overflow-y:auto;min-width:0}
+.sidebar{width:0;background:var(--sidebar);border-right:0;padding:0;position:sticky;top:60px;
+         height:calc(100vh - 60px);overflow:hidden;flex-shrink:0;
+         transition:width .25s ease,padding .25s ease,border-color .25s ease}
+.app.sidebar-open .sidebar{width:260px;border-right:1px solid var(--border);padding:22px 16px;overflow-y:auto}
+.content{flex:1;padding:28px;overflow-y:auto;min-width:0;transition:padding .25s ease}
 
-/* SIDEBAR ───*/
+@media(max-width:700px){
+  .app{flex-direction:column}
+  .sidebar{position:static;width:100%;height:auto;max-height:0;border-right:0;padding:0 16px}
+  .app.sidebar-open .sidebar{width:100%;max-height:70vh;border-right:0;padding:16px;overflow-y:auto}
+}
+
+/* Sidebar */
 .sidebar-section{margin-bottom:28px}
 .sidebar-label{font-size:.7rem;font-weight:600;color:var(--muted);
                letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px;padding:0 8px}
@@ -62,7 +73,7 @@ body{font-family:'Poppins',sans-serif;background:var(--bg);color:var(--text);min
 .no-trips{text-align:center;color:var(--muted);font-size:.825rem;padding:16px 0}
 .no-trips .no-icon{font-size:2rem;margin-bottom:8px}
 
-/* TOP BAR / GREETING ─ */
+/* Greeting */
 .greeting{margin-bottom:26px}
 .greeting h1{font-size:1.6rem;font-weight:700;margin-bottom:4px}
 .greeting p{color:var(--muted);font-size:.9rem}
@@ -89,6 +100,29 @@ body{font-family:'Poppins',sans-serif;background:var(--bg);color:var(--text);min
                       background:#fff;outline:none;transition:border-color .2s,box-shadow .2s}
 .fg input:focus,.fg select:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(37,99,235,.1)}
 .fg.full{grid-column:1/-1}
+
+.destination-search{position:relative}
+.destination-suggestions{display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;
+                         background:#fff;border:1px solid var(--border);border-radius:var(--r-sm);
+                         box-shadow:var(--shadow);overflow:hidden;z-index:30}
+.destination-suggestions.show{display:block}
+.destination-suggestion{display:block;width:100%;padding:10px 14px;background:#fff;border:0;
+                        border-bottom:1px solid var(--border);text-align:left;color:var(--text);
+                        font-family:'Poppins',sans-serif;font-size:.9rem;cursor:pointer}
+.destination-suggestion:last-child{border-bottom:0}
+.destination-suggestion:hover{background:var(--primary-l);color:var(--primary-d)}
+.destination-empty{padding:10px 14px;color:var(--muted);font-size:.85rem}
+
+.transport-info{display:none;margin-top:18px;padding:18px;background:var(--primary-l);border-radius:var(--r-sm)}
+.transport-info.show{display:block}
+.transport-info h3{font-size:1rem;margin-bottom:8px}
+.transport-notice{font-size:.82rem;color:var(--muted);line-height:1.5;margin-bottom:14px}
+.transport-detail{background:#fff;border:1px solid var(--border);border-radius:var(--r-sm);padding:12px 14px;
+                  font-size:.86rem;margin:8px 0}
+.transport-detail strong{display:block;margin-bottom:3px}
+.external-booking-link{display:inline-block;margin-top:12px;padding:9px 14px;background:var(--primary);
+                       border-radius:var(--r-sm);color:#fff;text-decoration:none;font-size:.84rem;font-weight:600}
+.external-booking-link:hover{background:var(--primary-d)}
 
 /* interests checkboxes */
 .interests-grid{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
@@ -119,7 +153,7 @@ body{font-family:'Poppins',sans-serif;background:var(--bg);color:var(--text);min
 .city-attractions{font-size:.74rem;color:var(--muted);margin-top:9px}
 .explore-btn{margin-top:10px;padding:9px 14px;border:0;border-radius:var(--r-sm);background:var(--primary);color:#fff;font-family:'Poppins',sans-serif;font-weight:600;cursor:pointer}
 
-/* LOADING ───*/
+/* Loading */
 .loading-overlay{display:none;text-align:center;padding:60px 20px}
 .loading-overlay.show{display:block}
 .spinner{width:52px;height:52px;border:4px solid var(--primary-l);
@@ -130,12 +164,12 @@ body{font-family:'Poppins',sans-serif;background:var(--bg);color:var(--text);min
 .loading-dots::after{content:'.';animation:dots 1.4s steps(4,end) infinite}
 @keyframes dots{0%,20%{content:'.'}40%{content:'..'}60%{content:'...'}80%,100%{content:''}}
 
-/* ERROR ─ */
+/* Error message */
 .error-box{background:#fef2f2;border:1px solid #fca5a5;border-radius:var(--r-sm);
            padding:14px 18px;color:#b91c1c;font-size:.875rem;display:none;margin-top:12px}
 .error-box.show{display:block}
 
-/* ITINERARY RESULT ─*/
+/* Itinerary result */
 #itineraryResult{display:none}
 #itineraryResult.show{display:block}
 
@@ -145,6 +179,19 @@ body{font-family:'Poppins',sans-serif;background:var(--bg);color:var(--text);min
 .trip-hero h2{font-size:1.7rem;font-weight:700;margin-bottom:6px}
 .trip-hero .overview{font-size:.9rem;opacity:.9;max-width:600px;line-height:1.6}
 .trip-hero-meta{display:flex;gap:20px;flex-wrap:wrap;margin-top:12px}
+.itinerary-options{display:none;background:var(--card);border-radius:var(--radius);padding:18px 22px;
+                   box-shadow:var(--shadow);margin-bottom:18px}
+.itinerary-options.show{display:block}
+.itinerary-options h3{font-size:1rem;margin-bottom:10px}
+.itinerary-option-list{display:flex;gap:10px;flex-wrap:wrap}
+.itinerary-option{flex:1 1 180px;text-align:left;padding:11px 13px;background:#fff;
+                   border:1px solid var(--border);border-radius:var(--r-sm);color:var(--text);
+                   font:inherit;cursor:pointer}
+.itinerary-option:hover,.itinerary-option.active{border-color:var(--primary);background:var(--primary-l)}
+.itinerary-option-number{display:block;color:var(--primary);font-size:.72rem;font-weight:700;
+                         letter-spacing:.04em;margin-bottom:4px;text-transform:uppercase}
+.itinerary-option strong{display:block;font-size:.88rem;margin-bottom:3px}
+.itinerary-option span{display:block;color:var(--muted);font-size:.76rem;line-height:1.4}
 .meta-item{background:rgba(255,255,255,.18);border-radius:20px;padding:5px 14px;
            font-size:.8rem;display:flex;align-items:center;gap:6px}
 .trip-actions{display:flex;gap:10px;flex-shrink:0;flex-wrap:wrap}
@@ -290,6 +337,7 @@ body{font-family:'Poppins',sans-serif;background:var(--bg);color:var(--text);min
   <div class="nav-brand"> 
     <span class="nav-title">Plan<span>Go</span></span>
   </div>
+  <button type="button" class="sidebar-toggle" id="sidebarToggle" aria-label="Close sidebar" aria-expanded="true">×</button>
   <div class="nav-right">
     <div class="nav-user">
       <div class="avatar" id="userAvatar">?</div>
@@ -299,7 +347,7 @@ body{font-family:'Poppins',sans-serif;background:var(--bg);color:var(--text);min
   </div>
 </nav>
 
-<div class="app">
+<div class="app sidebar-open">
   <!-- SIDEBAR -->
   <aside class="sidebar">
     <div class="sidebar-section">
@@ -314,19 +362,13 @@ body{font-family:'Poppins',sans-serif;background:var(--bg);color:var(--text);min
     <div class="sidebar-section">
       <div class="sidebar-label">My Trips</div>
       <div id="savedTripsList">
-        <div class="no-trips"><div class="no-icon">🌍</div><p>No trips yet.<br/>Plan one!</p></div>
+        <div class="no-trips"><p>No trips yet.<br/>Plan one.</p></div>
       </div>
     </div>
     <div class="sidebar-section">
-      <div class="sidebar-label">Quick Links</div>
-      <button class="sidebar-btn" onclick="window.open('https://www.irctc.co.in','_blank')">
-        <span class="icon"></span> IRCTC Trains
-      </button>
-      <button class="sidebar-btn" onclick="window.open('https://www.goindigo.in','_blank')">
-        <span class="icon"></span> IndiGo Flights
-      </button>
-      <button class="sidebar-btn" onclick="window.open('https://www.makemytrip.com','_blank')">
-        <span class="icon"></span> MakeMyTrip
+      <div class="sidebar-label">Travel Tools</div>
+      <button class="sidebar-btn" onclick="showPanel('transport',this)">
+        <span class="icon"></span> Transport Planning
       </button>
     </div>
   </aside>
@@ -338,23 +380,30 @@ body{font-family:'Poppins',sans-serif;background:var(--bg);color:var(--text);min
     <div class="panel active" id="panel-planner">
       <div class="greeting">
         <h1>Hello, <em id="greetName">Traveler</em>! </h1>
-        <p>Where do you want to go today? Let AI plan your perfect trip.</p>
+        <p>Enter your trip details to create an itinerary.</p>
       </div>
 
       <!-- Form -->
       <div class="form-card">
-        <h2> Plan a New Trip</h2>
-        <p class="desc">Fill in your details and our AI will generate a complete personalized itinerary.</p>
+        <h2>Plan a New Trip</h2>
+        <p class="desc">Fill in your details to generate an itinerary.</p>
 
         <div class="form-grid">
           <div class="fg full">
             <label>State or Destination *</label>
-            <input type="text" id="destination" placeholder="For India, enter a state such as Rajasthan"/>
+            <div class="destination-search">
+              <input type="text" id="destination" placeholder="For India, enter a state such as Rajasthan" autocomplete="off" aria-autocomplete="list" aria-controls="destinationSuggestions"/>
+              <div class="destination-suggestions" id="destinationSuggestions" role="listbox"></div>
+            </div>
             <button type="button" class="explore-btn" onclick="loadCitiesForState()">Explore cities and attractions</button>
           </div>
           <div class="fg">
             <label>Number of Days *</label>
             <input type="number" id="days" value="3" min="1" max="14"/>
+          </div>
+          <div class="fg">
+            <label>Number of Travelers *</label>
+            <input type="number" id="travelers" value="1" min="1" step="1"/>
           </div>
           <div class="fg">
             <label>Budget Level</label>
@@ -408,7 +457,7 @@ body{font-family:'Poppins',sans-serif;background:var(--bg);color:var(--text);min
         </div>
 
         <button class="generate-btn" id="generateBtn" onclick="generateItinerary()">
-          <span></span> Generate AI Itinerary
+          Generate Itinerary
         </button>
         <div class="error-box" id="formError"></div>
       </div>
@@ -417,10 +466,15 @@ body{font-family:'Poppins',sans-serif;background:var(--bg);color:var(--text);min
       <div class="loading-overlay" id="loadingOverlay">
         <div class="spinner"></div>
         <p style="font-weight:600;font-size:1rem;margin-bottom:6px">Generating your itinerary<span class="loading-dots"></span></p>
-        <p class="loading-text">Our AI is crafting the perfect trip for you </p>
+        <p class="loading-text">Please wait while your itinerary is generated.</p>
       </div>
 
       <!-- Result -->
+      <div class="itinerary-options" id="itineraryOptions">
+        <h3>Choose an itinerary option</h3>
+        <div class="itinerary-option-list" id="itineraryOptionList"></div>
+      </div>
+
       <div id="itineraryResult">
 
         <!-- Hero -->
@@ -459,11 +513,56 @@ body{font-family:'Poppins',sans-serif;background:var(--bg);color:var(--text);min
       </div><!-- /itineraryResult -->
     </div><!-- /panel-planner -->
 
-    <!-- CHAT PANEL ─-->
+    <!-- Chat panel -->
+    <div class="panel" id="panel-transport">
+      <div class="greeting">
+        <h1>Transport Planning</h1>
+        <p>Plan your journey details and view the transport references stored in PlanGo.</p>
+      </div>
+
+      <div class="form-card">
+        <h2>Plan Internal Transport</h2>
+        <p class="desc">PlanGo provides destination reference information only. It does not show live availability, prices, or bookings.</p>
+
+        <div class="form-grid">
+          <div class="fg">
+            <label>From *</label>
+            <input type="text" id="transportFrom" placeholder="Starting city or location"/>
+          </div>
+          <div class="fg">
+            <label>Destination *</label>
+            <input type="text" id="transportDestination" list="transportDestinationOptions" placeholder="Choose a destination" autocomplete="off"/>
+            <datalist id="transportDestinationOptions"></datalist>
+          </div>
+          <div class="fg">
+            <label>Travel Date *</label>
+            <input type="date" id="transportDate"/>
+          </div>
+          <div class="fg">
+            <label>Number of Travelers *</label>
+            <input type="number" id="transportTravelers" value="1" min="1" step="1"/>
+          </div>
+          <div class="fg">
+            <label>Transport Type *</label>
+            <select id="transportType">
+              <option value="Train">Train</option>
+              <option value="Bus">Bus</option>
+              <option value="Flight">Flight</option>
+              <option value="Cab">Cab</option>
+            </select>
+          </div>
+        </div>
+
+        <button type="button" class="generate-btn" onclick="loadTransportInfo()">Show Transport Information</button>
+        <div class="error-box" id="transportError"></div>
+        <div class="transport-info" id="transportInfo"></div>
+      </div>
+    </div>
+
     <div class="panel" id="panel-chat">
       <div class="greeting">
-        <h1> AI Travel Assistant</h1>
-        <p>Ask anything about your trip — destinations, tips, food, safety, and more.</p>
+        <h1>Travel Assistant</h1>
+        <p>Ask about destinations, food, safety, or travel tips.</p>
       </div>
       <div class="chat-wrap">
         <div class="chat-header">
@@ -476,7 +575,7 @@ body{font-family:'Poppins',sans-serif;background:var(--bg);color:var(--text);min
         </div>
         <div class="chat-messages" id="chatMessages">
           <div class="chat-msg bot">
-            <div class="bubble"> Hi! I'm PlanGo AI, your personal travel assistant.<br/>Ask me anything — best destinations, local tips, budget advice, visa info, or anything travel related!</div>
+            <div class="bubble">Hi! I can help with destinations, local tips, budgets, and visa information.</div>
             <span class="msg-time">Just now</span>
           </div>
         </div>
@@ -501,6 +600,8 @@ body{font-family:'Poppins',sans-serif;background:var(--bg);color:var(--text);min
 const USER_NAME  = "{{ user_name }}";
 const USER_EMAIL = "{{ user_email }}";
 let currentItinerary = null;
+let itineraryOptions = [];
+let selectedItineraryIndex = 0;
 let savedTrips = JSON.parse(localStorage.getItem('plango_trips') || '[]');
 
 document.getElementById('greetName').textContent   = USER_NAME.split(' ')[0];
@@ -508,7 +609,17 @@ document.getElementById('navUserName').textContent = USER_NAME;
 document.getElementById('userAvatar').textContent  = USER_NAME.charAt(0).toUpperCase();
 renderSavedTrips();
 
-// Panel / Tab switching ─
+const appLayout = document.querySelector('.app');
+const sidebarToggle = document.getElementById('sidebarToggle');
+
+sidebarToggle.addEventListener('click', () => {
+  const isOpen = appLayout.classList.toggle('sidebar-open');
+  sidebarToggle.textContent = isOpen ? '×' : '☰';
+  sidebarToggle.setAttribute('aria-expanded', String(isOpen));
+  sidebarToggle.setAttribute('aria-label', isOpen ? 'Close sidebar' : 'Open sidebar');
+});
+
+// Panel and tab switching
 function showPanel(name, btn) {
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('active'));
@@ -522,7 +633,7 @@ function switchTab(name, btn) {
   btn.classList.add('active');
 }
 
-// Interest chips toggle — use checkbox change event to avoid double-fire
+// Update selected interests
 document.querySelectorAll('.interest-chip input[type="checkbox"]').forEach(function(cb) {
   cb.addEventListener('change', function() {
     cb.closest('.interest-chip').classList.toggle('selected', cb.checked);
@@ -533,6 +644,152 @@ function escapeHtml(value) {
   return String(value).replace(/[&<>'"]/g, character => ({
     '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
   })[character]);
+}
+
+const destinationInput = document.getElementById('destination');
+const destinationSuggestions = document.getElementById('destinationSuggestions');
+let destinationSearchTimer;
+let latestDestinationSearch = 0;
+
+function hideDestinationSuggestions() {
+  destinationSuggestions.classList.remove('show');
+  destinationSuggestions.innerHTML = '';
+}
+
+function showDestinationSuggestions(suggestions) {
+  if (!suggestions.length) {
+    destinationSuggestions.innerHTML = '<div class="destination-empty">No destinations found</div>';
+  } else {
+    destinationSuggestions.innerHTML = suggestions.map(name =>
+      `<button type="button" class="destination-suggestion" role="option">${escapeHtml(name)}</button>`
+    ).join('');
+
+    destinationSuggestions.querySelectorAll('.destination-suggestion').forEach(button => {
+      button.addEventListener('mousedown', () => {
+        destinationInput.value = button.textContent;
+        hideDestinationSuggestions();
+        destinationInput.focus();
+      });
+    });
+  }
+  destinationSuggestions.classList.add('show');
+}
+
+async function searchDestinations() {
+  const query = destinationInput.value.trim();
+  const searchId = latestDestinationSearch;
+  if (!query) {
+    hideDestinationSuggestions();
+    return;
+  }
+
+  try {
+    const response = await fetch('/api/destination-suggestions?q=' + encodeURIComponent(query));
+    const data = await response.json();
+    if (searchId !== latestDestinationSearch || !response.ok) return;
+    showDestinationSuggestions(data.suggestions || []);
+  } catch (error) {
+    if (searchId === latestDestinationSearch) hideDestinationSuggestions();
+  }
+}
+
+destinationInput.addEventListener('input', () => {
+  clearTimeout(destinationSearchTimer);
+  latestDestinationSearch += 1;
+  destinationSearchTimer = setTimeout(searchDestinations, 200);
+});
+destinationInput.addEventListener('blur', () => setTimeout(hideDestinationSuggestions, 150));
+destinationInput.addEventListener('focus', () => {
+  if (destinationInput.value.trim()) searchDestinations();
+});
+
+const transportDestinationInput = document.getElementById('transportDestination');
+const transportDestinationOptions = document.getElementById('transportDestinationOptions');
+let transportDestinationTimer;
+
+document.getElementById('transportDate').value = new Date().toISOString().split('T')[0];
+
+transportDestinationInput.addEventListener('input', () => {
+  clearTimeout(transportDestinationTimer);
+  const query = transportDestinationInput.value.trim();
+  if (!query) {
+    transportDestinationOptions.innerHTML = '';
+    return;
+  }
+
+  transportDestinationTimer = setTimeout(async () => {
+    try {
+      const response = await fetch('/api/destination-suggestions?q=' + encodeURIComponent(query));
+      const data = await response.json();
+      if (!response.ok) return;
+      transportDestinationOptions.innerHTML = (data.suggestions || []).map(name =>
+        `<option value="${escapeHtml(name)}"></option>`
+      ).join('');
+    } catch (error) {
+      transportDestinationOptions.innerHTML = '';
+    }
+  }, 200);
+});
+
+function showTransportError(message) {
+  const errorBox = document.getElementById('transportError');
+  errorBox.textContent = message;
+  errorBox.classList.add('show');
+}
+
+async function loadTransportInfo() {
+  const from = document.getElementById('transportFrom').value.trim();
+  const destination = transportDestinationInput.value.trim();
+  const date = document.getElementById('transportDate').value;
+  const travelers = Number(document.getElementById('transportTravelers').value);
+  const transportType = document.getElementById('transportType').value;
+  const errorBox = document.getElementById('transportError');
+  const infoBox = document.getElementById('transportInfo');
+
+  errorBox.classList.remove('show');
+  infoBox.classList.remove('show');
+
+  if (!from || !destination || !date) {
+    showTransportError('Please complete From, Destination, and Travel Date.');
+    return;
+  }
+  if (!Number.isInteger(travelers) || travelers < 1) {
+    showTransportError('Number of travelers must be at least 1.');
+    return;
+  }
+
+  try {
+    const response = await fetch('/api/transport-info?destination=' + encodeURIComponent(destination));
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'Could not load transport information.');
+
+    const destinationInfo = data.destination;
+    let storedReference;
+    if (transportType === 'Train') {
+      storedReference = `<div class="transport-detail"><strong>Nearest railway station</strong>${escapeHtml(destinationInfo.nearest_railway_station)}</div>`;
+    } else if (transportType === 'Flight') {
+      storedReference = `<div class="transport-detail"><strong>Nearest airport</strong>${escapeHtml(destinationInfo.nearest_airport)}</div>`;
+    } else {
+      storedReference = `<div class="transport-detail"><strong>Nearest railway station</strong>${escapeHtml(destinationInfo.nearest_railway_station)}</div>
+        <div class="transport-detail"><strong>Nearest airport</strong>${escapeHtml(destinationInfo.nearest_airport)}</div>`;
+    }
+
+    const bookingUrls = {
+      Train: 'https://www.irctc.co.in/nget/train-search',
+      Bus: 'https://www.makemytrip.com/bus-tickets/',
+      Flight: 'https://www.goindigo.in/',
+      Cab: 'https://www.makemytrip.com/cabs/'
+    };
+
+    infoBox.innerHTML = `<h3>PlanGo transport information</h3>
+      <p class="transport-notice"><strong>Your plan:</strong> ${escapeHtml(from)} to ${escapeHtml(destinationInfo.name)} on ${escapeHtml(date)} for ${travelers} traveler${travelers === 1 ? '' : 's'} by ${escapeHtml(transportType)}.</p>
+      <p class="transport-notice">The following reference is stored in PlanGo's destination data for ${escapeHtml(destinationInfo.name)}, ${escapeHtml(destinationInfo.state)}. PlanGo does not provide live schedules, availability, prices, or booking confirmation.</p>
+      ${storedReference}
+      <a class="external-booking-link" href="${bookingUrls[transportType]}" target="_blank" rel="noopener">Continue to external booking</a>`;
+    infoBox.classList.add('show');
+  } catch (error) {
+    showTransportError(error.message || 'Could not load transport information.');
+  }
 }
 
 async function loadCitiesForState() {
@@ -585,11 +842,13 @@ function selectCity(encodedName, card) {
 async function generateItinerary() {
   const dest = document.getElementById('destination').value.trim();
   const days = parseInt(document.getElementById('days').value);
+  const travelers = Number(document.getElementById('travelers').value);
   const errBox = document.getElementById('formError');
   errBox.classList.remove('show');
 
   if (!dest) { showErr('Please enter a destination.'); return; }
   if (!days || days < 1 || days > 14) { showErr('Days must be between 1 and 14.'); return; }
+  if (!Number.isInteger(travelers) || travelers < 1) { showErr('Number of travelers must be at least 1.'); return; }
 
   const interests = [...document.querySelectorAll('.interest-chip.selected input')]
                     .map(i => i.value);
@@ -597,6 +856,7 @@ async function generateItinerary() {
   const payload = {
     destination: dest,
     days,
+    travelers,
     budget:       document.getElementById('budget').value,
     travel_style: document.getElementById('travel_style').value,
     currency:     document.getElementById('currency').value,
@@ -606,6 +866,7 @@ async function generateItinerary() {
   document.getElementById('generateBtn').disabled = true;
   document.getElementById('loadingOverlay').classList.add('show');
   document.getElementById('itineraryResult').classList.remove('show');
+  document.getElementById('itineraryOptions').classList.remove('show');
 
   try {
     const res  = await fetch('/api/generate-itinerary', {
@@ -619,9 +880,11 @@ async function generateItinerary() {
     }
     const data = await res.json();
 
-    if (res.ok && data.success) {
-      currentItinerary = data.itinerary;
-      renderItinerary(data.itinerary);
+    if (res.ok && data.success && Array.isArray(data.options) && data.options.length === 3) {
+      itineraryOptions = data.options;
+      selectedItineraryIndex = 0;
+      renderItineraryOptions();
+      showItineraryOption(0);
     } else {
       showErr(data.error || 'Something went wrong. Please try again.');
     }
@@ -631,6 +894,27 @@ async function generateItinerary() {
     document.getElementById('generateBtn').disabled = false;
     document.getElementById('loadingOverlay').classList.remove('show');
   }
+}
+
+function renderItineraryOptions() {
+  const list = document.getElementById('itineraryOptionList');
+  list.innerHTML = itineraryOptions.map((option, index) => `
+    <button type="button" class="itinerary-option${index === selectedItineraryIndex ? ' active' : ''}" onclick="showItineraryOption(${index})" aria-label="Itinerary ${index + 1}: ${escapeHtml(option.title)}">
+      <span class="itinerary-option-number">Itinerary ${index + 1}</span>
+      <strong>${escapeHtml(option.title)}</strong>
+      <span>${escapeHtml(option.description)}</span>
+    </button>`).join('');
+  document.getElementById('itineraryOptions').classList.add('show');
+}
+
+function showItineraryOption(index) {
+  if (!itineraryOptions[index]) return;
+  selectedItineraryIndex = index;
+  currentItinerary = itineraryOptions[index].itinerary;
+  renderItinerary(currentItinerary);
+  document.querySelectorAll('.itinerary-option').forEach((button, buttonIndex) => {
+    button.classList.toggle('active', buttonIndex === index);
+  });
 }
 
 function showErr(msg) {
@@ -643,10 +927,9 @@ function showErr(msg) {
 function renderItinerary(it) {
   const cur = document.getElementById('currency').value;
   const sym = cur === 'INR' ? '₹' : cur === 'EUR' ? '€' : cur === 'GBP' ? '£' : '$';
-  const slotIcons = {morning: '🌅', afternoon: '☀️', evening: '🌙'};
 
   // Hero
-  document.getElementById('rDestination').textContent = '📍 ' + it.destination;
+  document.getElementById('rDestination').textContent = it.destination;
   document.getElementById('rOverview').textContent    = it.overview || '';
   document.getElementById('rMeta').innerHTML = `
     <div class="meta-item"> ${it.duration} Days</div>
@@ -663,7 +946,7 @@ function renderItinerary(it) {
     {icon:'',label:'TOTAL',        val:b.total}
   ].map(x=>`<div class="budget-card"><div class="b-icon">${x.icon}</div>
     <div class="b-label">${x.label}</div>
-    <div class="b-value">${x.val||'—'}</div></div>`).join('');
+    <div class="b-value">${x.val||'Not available'}</div></div>`).join('');
 
   // Days
   document.getElementById('tab-days').innerHTML = (it.days||[]).map(day=>`
@@ -676,11 +959,11 @@ function renderItinerary(it) {
         ${['morning','afternoon','evening'].map(t=>{
           const s=day[t]||{};
           return `<div class="slot ${t}">
-            <div class="slot-time">${slotIcons[t]} ${t.charAt(0).toUpperCase()+t.slice(1)}</div>
-            <div class="slot-activity">${s.activity||'—'}</div>
+            <div class="slot-time">${t.charAt(0).toUpperCase()+t.slice(1)}</div>
+            <div class="slot-activity">${s.activity||'Not available'}</div>
             <div class="slot-desc">${s.description||''}</div>
             <div class="slot-meta">
-              <span class="slot-tag">⏱ ${s.duration||''}</span>
+              <span class="slot-tag">${s.duration||''}</span>
               <span class="slot-tag">${sym} ${String(s.cost || '').replace(/[$€£₹]/g,'')}</span>
             </div>
           </div>`;
@@ -689,21 +972,20 @@ function renderItinerary(it) {
       <div class="meals-row">
         ${['breakfast','lunch','dinner'].map(m=>`
           <div class="meal-item">
-            <div class="meal-label">${m==='breakfast'?'':m==='lunch'?'🌞':'🌛'} ${m}</div>
-            <div class="meal-name">${(day.meals||{})[m]||'—'}</div>
+            <div class="meal-label">${m}</div>
+            <div class="meal-name">${(day.meals||{})[m]||'Not available'}</div>
           </div>`).join('')}
       </div>
-      ${day.tips?`<div class="day-tip"><span>💡</span><span>${day.tips}</span></div>`:''}
+      ${day.tips?`<div class="day-tip"><span>${day.tips}</span></div>`:''}
     </div>`).join('');
 
   // Packing
   const pl = it.packing_list || {};
-  const packIcons = {essentials:'🎒',clothing:'👕',tech:'📱',health:'💊',documents:'📄'};
   document.getElementById('tab-packing').innerHTML = `
     <div class="packing-grid">
       ${Object.entries(pl).map(([cat,items])=>`
         <div class="pack-section">
-          <div class="pack-title">${packIcons[cat]||'📦'} ${cat.charAt(0).toUpperCase()+cat.slice(1)}</div>
+          <div class="pack-title">${cat.charAt(0).toUpperCase()+cat.slice(1)}</div>
           ${(items||[]).map(item=>`
             <div class="pack-item" onclick="togglePack(this)">
               <div class="pack-check"></div>
@@ -713,40 +995,38 @@ function renderItinerary(it) {
     </div>`;
 
   // Tips
-  const tipIcons = ['🗺️','🛡️','📱','💡','🤝'];
   document.getElementById('tab-tips').innerHTML = `
     <div class="tips-grid" style="margin-bottom:20px">
       ${(it.local_tips||[]).map((t,i)=>`
         <div class="tip-card">
-          <div class="tip-icon">${tipIcons[i%tipIcons.length]}</div>
           <div class="tip-text">${t}</div>
         </div>`).join('')}
     </div>
     ${it.must_try_foods ? `
       <div class="info-card">
-        <h4>🍜 Must-Try Foods</h4>
+        <h4>Foods to Try</h4>
         <div class="foods-row">
           ${it.must_try_foods.map(f=>`<span class="food-chip">${f}</span>`).join('')}
         </div>
       </div>` : ''}
     <div class="info-card">
-      <h4>🆘 Emergency Information</h4>
+      <h4>Emergency Information</h4>
       ${Object.entries(it.emergency_info||{}).map(([k,v])=>`
         <div class="info-row"><strong>${k.replace(/_/g,' ')}</strong><span>${v}</span></div>`).join('')}
     </div>
     <div class="info-card">
-      <h4>🗓️ Best Time to Visit</h4>
-      <p style="font-size:.875rem;line-height:1.6;color:var(--muted)">${it.best_time_to_visit||'—'}</p>
+      <h4>Best Time to Visit</h4>
+      <p style="font-size:.875rem;line-height:1.6;color:var(--muted)">${it.best_time_to_visit||'Not available'}</p>
     </div>`;
 
   document.getElementById('itineraryResult').classList.add('show');
   document.getElementById('itineraryResult').scrollIntoView({behavior:'smooth',block:'start'});
 }
 
-// Packing check toggle ──
+// Packing list checkbox
 function togglePack(el) {
   el.classList.toggle('done');
-  el.querySelector('.pack-check').textContent = el.classList.contains('done') ? '✓' : '';
+  el.querySelector('.pack-check').textContent = el.classList.contains('done') ? 'Done' : '';
 }
 
 // Save & Share 
@@ -758,25 +1038,25 @@ function saveTrip() {
     localStorage.setItem('plango_trips', JSON.stringify(savedTrips));
     renderSavedTrips();
   }
-  alert('✅ Trip saved to My Trips!');
+  alert('Trip saved to My Trips.');
 }
 function shareTrip() {
   if (!currentItinerary) return;
-  const text = `✈️ ${currentItinerary.destination} – ${currentItinerary.duration} day trip\n\n${currentItinerary.overview}\n\nPlanned with PlanGo AI 🌍`;
+  const text = `${currentItinerary.destination}: ${currentItinerary.duration} day trip\n\n${currentItinerary.overview}\n\nPlanned with PlanGo`;
   if (navigator.share) { navigator.share({ title: 'My Trip Plan', text }); }
-  else { navigator.clipboard.writeText(text); alert('📋 Trip summary copied to clipboard!'); }
+  else { navigator.clipboard.writeText(text); alert('Trip summary copied to clipboard.'); }
 }
 function renderSavedTrips() {
   const el = document.getElementById('savedTripsList');
-  if (!savedTrips.length) { el.innerHTML = '<div class="no-trips"><div class="no-icon">🌍</div><p>No trips yet.<br/>Plan one!</p></div>'; return; }
+  if (!savedTrips.length) { el.innerHTML = '<div class="no-trips"><p>No trips yet.<br/>Plan one.</p></div>'; return; }
   el.innerHTML = savedTrips.map(t=>`
     <div class="trip-card-mini">
-      <h4>📍 ${t.destination}</h4>
+      <h4>${t.destination}</h4>
       <p>${t.duration} days · ${t.date}</p>
     </div>`).join('');
 }
 
-// AI Chat ───
+// Travel assistant chat
 async function sendChat() {
   const input = document.getElementById('chatInput');
   const msg = input.value.trim();
@@ -793,10 +1073,10 @@ async function sendChat() {
     });
     const data = await res.json();
     typing.remove();
-    appendMsg('bot', data.success ? data.reply : '⚠️ Sorry, I encountered an error. Please try again.');
+    appendMsg('bot', data.success ? data.reply : 'Sorry, an error occurred. Please try again.');
   } catch(e) {
     typing.remove();
-    appendMsg('bot', '⚠️ Network error. Please check your connection.');
+    appendMsg('bot', 'Network error. Please check your connection.');
   }
 }
 function sendSuggestion(btn) {

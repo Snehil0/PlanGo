@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PlanGo - Manage Destinations</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"/>
+  <style>
+    .admin-page{max-width:1200px;margin:0 auto;padding:48px 24px 72px}
+    .admin-heading{margin-bottom:30px}.admin-heading h1{font-size:2rem;color:#fff;margin-bottom:8px}
+    .admin-heading p{color:var(--muted)}.admin-back{color:#a89dff;text-decoration:none;font-size:.9rem}.admin-back:hover{text-decoration:underline}
+    .admin-card{background:var(--card-bg);border:1px solid var(--border);border-radius:var(--radius);padding:26px;margin-bottom:24px}
+    .admin-card h2{font-size:1.15rem;color:#fff;margin-bottom:8px}.admin-card p{color:var(--muted);font-size:.88rem;margin-bottom:18px}
+    .admin-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}.admin-field{display:flex;flex-direction:column;gap:6px}
+    .admin-field.full{grid-column:1/-1}.admin-field label{color:var(--muted);font-size:.78rem;text-transform:uppercase;letter-spacing:.06em}
+    .admin-field input,.admin-field select{width:100%;padding:11px 13px;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:8px;color:#fff;font:inherit;outline:none}
+    .admin-field select option{background:var(--dark2);color:#fff}.admin-field input:focus,.admin-field select:focus{border-color:var(--primary)}
+    .admin-button{margin-top:18px;padding:11px 16px;border:0;border-radius:8px;background:var(--grad);color:#fff;font:inherit;font-weight:600;cursor:pointer}
+    .admin-button.secondary{background:transparent;border:1px solid var(--border);text-decoration:none;display:inline-block;margin-left:8px}.admin-button.danger{margin:0;background:#b91c1c}
+    .admin-message{padding:12px 14px;border-radius:8px;margin-bottom:18px;font-size:.88rem}.admin-message.success{background:rgba(67,233,123,.12);border:1px solid rgba(67,233,123,.35);color:#a7f3d0}.admin-message.error{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.35);color:#fecaca}
+    .admin-table-wrap{overflow-x:auto}.admin-table{width:100%;border-collapse:collapse;font-size:.84rem}.admin-table th,.admin-table td{padding:12px 10px;border-bottom:1px solid var(--border);text-align:left;vertical-align:top}.admin-table th{color:var(--muted);font-size:.72rem;text-transform:uppercase;letter-spacing:.06em}.admin-table td{color:var(--text)}
+    .table-actions{display:flex;gap:8px}.table-actions a,.table-actions button{padding:7px 10px;border-radius:6px;font:inherit;font-size:.8rem;cursor:pointer}.table-actions a{background:rgba(108,99,255,.18);color:#fff;text-decoration:none}.table-actions button{background:transparent;color:#fecaca;border:1px solid rgba(239,68,68,.45)}
+    .table-actions form{margin:0}@media(max-width:700px){.admin-form-grid{grid-template-columns:1fr}.admin-field.full{grid-column:auto}.admin-page{padding:32px 16px}.admin-card{padding:20px}}
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-container">
+      <div class="logo">PlanGo</div>
+      <ul class="nav-links">
+        <li><a class="admin-back" href="{{ url_for('admin_dashboard') }}">Admin Dashboard</a></li>
+        <li><a class="admin-back" href="{{ url_for('planner') }}">Back to Planner</a></li>
+        <li><a class="btn-login" href="{{ url_for('logout') }}">Logout</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main class="admin-page">
+    <section class="admin-heading">
+      <h1>Manage Destinations</h1>
+      <p>Add, edit, or remove destination records. Signed in as {{ admin_name }}.</p>
+    </section>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        <div class="admin-message {{ category }}">{{ message }}</div>
+      {% endfor %}
+    {% endwith %}
+
+    <section class="admin-card">
+      <h2>{{ 'Edit Destination' if editing_destination else 'Add Destination' }}</h2>
+      <p>All fields are required. States are reused from the existing State table.</p>
+      <form method="post">
+        <input type="hidden" name="action" value="{{ 'update' if editing_destination else 'create' }}"/>
+        {% if editing_destination %}<input type="hidden" name="destination_id" value="{{ editing_destination.id }}"/>{% endif %}
+        <div class="admin-form-grid">
+          <div class="admin-field">
+            <label for="name">Destination Name</label>
+            <input id="name" name="name" maxlength="150" required value="{{ editing_destination.name if editing_destination else '' }}"/>
+          </div>
+          <div class="admin-field">
+            <label for="state_id">State</label>
+            <select id="state_id" name="state_id" required>
+              <option value="">Choose a state</option>
+              {% for state in states %}
+                <option value="{{ state.id }}" {% if editing_destination and editing_destination.state_id == state.id %}selected{% endif %}>{{ state.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="admin-field"><label for="region">Region</label><input id="region" name="region" maxlength="50" required value="{{ editing_destination.region if editing_destination else '' }}"/></div>
+          <div class="admin-field"><label for="category">Category</label><input id="category" name="category" maxlength="80" required value="{{ editing_destination.category if editing_destination else '' }}"/></div>
+          <div class="admin-field"><label for="popular_attraction_name">Popular Attraction</label><input id="popular_attraction_name" name="popular_attraction_name" maxlength="150" required value="{{ editing_destination.popular_attraction_name if editing_destination else '' }}"/></div>
+          <div class="admin-field"><label for="accessibility">Accessibility</label><input id="accessibility" name="accessibility" maxlength="50" required value="{{ editing_destination.accessibility if editing_destination else '' }}"/></div>
+          <div class="admin-field"><label for="nearest_airport">Nearest Airport</label><input id="nearest_airport" name="nearest_airport" maxlength="150" required value="{{ editing_destination.nearest_airport if editing_destination else '' }}"/></div>
+          <div class="admin-field"><label for="nearest_railway_station">Nearest Railway Station</label><input id="nearest_railway_station" name="nearest_railway_station" maxlength="150" required value="{{ editing_destination.nearest_railway_station if editing_destination else '' }}"/></div>
+        </div>
+        <button class="admin-button" type="submit">{{ 'Save Changes' if editing_destination else 'Add Destination' }}</button>
+        {% if editing_destination %}<a class="admin-button secondary" href="{{ url_for('manage_destinations') }}">Cancel</a>{% endif %}
+      </form>
+    </section>
+
+    <section class="admin-card">
+      <h2>Existing Destinations</h2>
+      <p>{{ destinations|length }} destination{{ '' if destinations|length == 1 else 's' }} in the database.</p>
+      <div class="admin-table-wrap">
+        <table class="admin-table">
+          <thead>
+            <tr><th>Destination</th><th>State</th><th>Region</th><th>Category</th><th>Accessibility</th><th>Nearest Airport</th><th>Nearest Railway Station</th><th>Actions</th></tr>
+          </thead>
+          <tbody>
+            {% for destination in destinations %}
+              <tr>
+                <td>{{ destination.name }}</td><td>{{ destination.state.name }}</td><td>{{ destination.region }}</td><td>{{ destination.category }}</td><td>{{ destination.accessibility }}</td><td>{{ destination.nearest_airport }}</td><td>{{ destination.nearest_railway_station }}</td>
+                <td><div class="table-actions">
+                  <a href="{{ url_for('manage_destinations', edit=destination.id) }}">Edit</a>
+                  <form method="post" onsubmit="return confirm('Delete {{ destination.name }}?');">
+                    <input type="hidden" name="action" value="delete"/><input type="hidden" name="destination_id" value="{{ destination.id }}"/>
+                    <button type="submit">Delete</button>
+                  </form>
+                </div></td>
+              </tr>
+            {% else %}
+              <tr><td colspan="8">No destinations have been added yet.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

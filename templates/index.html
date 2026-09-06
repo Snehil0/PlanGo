@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PlanGo - Your Smart Trip Planner</title>
+    <title>PlanGo - Trip Planner</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
@@ -20,8 +20,8 @@
     <!-- Hero Section -->
     <section class="hero" id="home">
         <div class="hero-content">
-            <h1>Plan Your Perfect Trip </h1>
-            <p>Get personalized AI itineraries and seamless booking options</p>
+            <h1>Plan Your Trip</h1>
+            <p>Create an itinerary based on your preferences and budget.</p>
             <button class="btn-primary" id="getStartedBtn">Get Started</button>
             <button class="btn-secondary" id="bookTicketsBtn">Book Tickets</button>
         </div>
@@ -32,21 +32,21 @@
         <h2>Why Choose PlanGo?</h2>
         <div class="features-grid">
             <div class="feature-card">
-                <h3> AI-Powered Planning</h3>
-                <p>Get personalized itineraries based on your preferences and budget</p>
+                <h3>Trip Planning</h3>
+                <p>Create an itinerary based on your preferences and budget.</p>
             </div>
             <div class="feature-card">
-                <h3> Easy Booking</h3>
+                <h3>Booking Links</h3>
                 <p>Direct links to book flights, hotels, and activities</p>
             </div>
             <div class="feature-card">
-                <h3> Budget Friendly</h3>
-                <p>Plan trips that fit your budget perfectly</p>
+                <h3>Budget Options</h3>
+                <p>Plan trips that fit your budget.</p>
             </div>
         </div>
     </section>
 
-    <!--  LOGIN MODAL  -->
+    <!-- Login modal -->
     <div id="loginModal" class="modal">
         <div class="modal-content">
             <span class="close" id="closeLogin">&times;</span>
@@ -68,12 +68,12 @@
         </div>
     </div>
 
-    <!--  SIGNUP MODAL ─ -->
+    <!-- Sign-up modal -->
     <div id="signupModal" class="modal">
         <div class="modal-content">
             <span class="close" id="closeSignup">&times;</span>
             <h2>Create Account</h2>
-            <p class="modal-subtitle">Start planning your dream trips</p>
+            <p class="modal-subtitle">Create an account to start planning.</p>
             <div id="signupAlert" class="alert-msg" style="display:none"></div>
             <form id="signupForm">
                 <div class="form-group">
@@ -105,27 +105,25 @@
         </div>
     </div>
 
-    <!--  BOOKING MODAL  -->
+    <!-- Booking modal -->
     <div id="bookingModal" class="modal">
         <div class="modal-content booking-modal">
             <span class="close" id="closeBooking">&times;</span>
-            <h2>Book Your Tickets</h2>
-            <p class="modal-subtitle">Choose your booking option</p>
+            <h2>Plan Your Transport</h2>
+            <p class="modal-subtitle">Sign in to plan your journey in PlanGo before continuing to an external booking provider.</p>
             <div class="booking-options">
-                <a href="https://www.irctc.co.in/nget/train-search" target="_blank" class="booking-btn-card">
-                    <!--photo for train ticket-->
+                <a href="/planner" class="booking-btn-card">
                     <div class="booking-btn-content">
-                        <h3> Train Tickets</h3>
-                        <p>Book train tickets via IRCTC</p>
-                        <span class="btn-arrow">Book Now →</span>
+                        <h3>Plan Train Transport</h3>
+                        <p>Enter journey details and view PlanGo transport references</p>
+                        <span class="btn-arrow">Open Planner</span>
                     </div>
                 </a>
-                <a href="https://www.goindigo.in/" target="_blank" class="booking-btn-card">
-                    <!--photo for flight ticket-->
+                <a href="/planner" class="booking-btn-card">
                     <div class="booking-btn-content">
-                        <h3> Flight Tickets</h3>
-                        <p>Book flight tickets via IndiGo</p>
-                        <span class="btn-arrow">Book Now →</span>
+                        <h3>Plan Flight Transport</h3>
+                        <p>Sign in to use PlanGo's internal transport planner</p>
+                        <span class="btn-arrow">Open Planner</span>
                     </div>
                 </a>
             </div>

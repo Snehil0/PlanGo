@@ -1,11 +1,8 @@
-/*
-   PLANGO – REVAMPED STYLESHEET
-   Stunning upgrade, same HTML classes – no HTML changes needed!
-*/
+/* Main site styles */
 
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
 
-/*  RESET ─*/
+/* Reset */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
@@ -35,7 +32,7 @@ body {
   overflow-x: hidden;
 }
 
-/*  SCROLLBAR ─*/
+/* Scrollbar */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: var(--dark2); }
 ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 3px; }
@@ -156,7 +153,7 @@ body {
   margin-right: auto;
 }
 
-/*  BUTTONS ─*/
+/* Buttons */
 .btn-primary {
   background: var(--grad);
   color: white;
@@ -367,7 +364,7 @@ select, select option { background: var(--dark2); color: var(--text); }
 .checkbox-label input[type="checkbox"] { width: 15px !important; accent-color: var(--primary); flex-shrink: 0; }
 .checkbox-label a { color: #a89dff; }
 
-/*  SIGNUP / LOGIN LINK ─ */
+/* Sign-up and login links */
 .signup-link, .login-link { text-align: center; margin-top: 18px; font-size: .85rem; color: var(--muted); }
 .signup-link a, .login-link a { color: #a89dff; text-decoration: none; font-weight: 600; }
 .signup-link a:hover, .login-link a:hover { text-decoration: underline; }
@@ -378,7 +375,7 @@ select, select option { background: var(--dark2); color: var(--text); }
   background: rgba(239,68,68,.12); border: 1px solid rgba(239,68,68,.3); color: #fca5a5;
 }
 
-/*  BOOKING MODAL ─ */
+/* Booking modal */
 .booking-modal { max-width: 540px; }
 .booking-options { display: flex; flex-direction: column; gap: 14px; margin-top: 8px; }
 
@@ -416,7 +413,7 @@ select, select option { background: var(--dark2); color: var(--text); }
   padding: 4px 14px; border-radius: 20px; font-weight: 600; font-size: .78rem;
 }
 
-/*  LOADING OVERLAY ─ */
+/* Loading overlay */
 .loading-overlay {
   position: fixed; inset: 0;
   background: rgba(13,13,26,.95);
