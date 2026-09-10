@@ -70,6 +70,10 @@ body{font-family:'Poppins',sans-serif;background:var(--bg);color:var(--text);min
                 border-radius:var(--r-sm);padding:14px;color:#fff;margin-bottom:10px;cursor:pointer}
 .trip-card-mini h4{font-size:.875rem;font-weight:600;margin-bottom:3px}
 .trip-card-mini p{font-size:.75rem;opacity:.85}
+.trip-card-mini-head{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.delete-saved-trip{border:0;background:transparent;color:#fff;font:inherit;font-size:.72rem;
+                   padding:1px 0;opacity:.85;cursor:pointer;text-decoration:underline}
+.delete-saved-trip:hover{opacity:1}
 .no-trips{text-align:center;color:var(--muted);font-size:.825rem;padding:16px 0}
 .no-trips .no-icon{font-size:2rem;margin-bottom:8px}
 
@@ -602,7 +606,13 @@ const USER_EMAIL = "{{ user_email }}";
 let currentItinerary = null;
 let itineraryOptions = [];
 let selectedItineraryIndex = 0;
-let savedTrips = JSON.parse(localStorage.getItem('plango_trips') || '[]');
+let savedTrips = [];
+try {
+  const storedTrips = JSON.parse(localStorage.getItem('plango_trips') || '[]');
+  savedTrips = Array.isArray(storedTrips) ? storedTrips : [];
+} catch (e) {
+  savedTrips = [];
+}
 
 document.getElementById('greetName').textContent   = USER_NAME.split(' ')[0];
 document.getElementById('navUserName').textContent = USER_NAME;
@@ -1034,7 +1044,14 @@ function saveTrip() {
   if (!currentItinerary) return;
   const exists = savedTrips.find(t => t.destination === currentItinerary.destination);
   if (!exists) {
-    savedTrips.push({ destination: currentItinerary.destination, duration: currentItinerary.duration, date: new Date().toLocaleDateString() });
+    savedTrips.push({
+      destination: currentItinerary.destination,
+      duration: currentItinerary.duration,
+      date: new Date().toLocaleDateString(),
+      itinerary: currentItinerary,
+      options: itineraryOptions,
+      selectedOptionIndex: selectedItineraryIndex
+    });
     localStorage.setItem('plango_trips', JSON.stringify(savedTrips));
     renderSavedTrips();
   }
@@ -1049,11 +1066,48 @@ function shareTrip() {
 function renderSavedTrips() {
   const el = document.getElementById('savedTripsList');
   if (!savedTrips.length) { el.innerHTML = '<div class="no-trips"><p>No trips yet.<br/>Plan one.</p></div>'; return; }
-  el.innerHTML = savedTrips.map(t=>`
-    <div class="trip-card-mini">
-      <h4>${t.destination}</h4>
-      <p>${t.duration} days · ${t.date}</p>
+  el.innerHTML = savedTrips.map((t, index)=>`
+    <div class="trip-card-mini" role="button" tabindex="0" onclick="openSavedTrip(${index})" onkeydown="if(event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openSavedTrip(${index}); }">
+      <div class="trip-card-mini-head">
+        <h4>${escapeHtml(t.destination || 'Saved trip')}</h4>
+        <button type="button" class="delete-saved-trip" onclick="deleteSavedTrip(event, ${index})" aria-label="Delete saved trip to ${escapeHtml(t.destination || 'destination')}">Delete</button>
+      </div>
+      <p>${escapeHtml(t.duration || 'Trip')} days · ${escapeHtml(t.date || '')}</p>
     </div>`).join('');
+}
+
+function openSavedTrip(index) {
+  const savedTrip = savedTrips[index];
+  if (!savedTrip || !savedTrip.itinerary) {
+    alert('This trip was saved before itinerary details could be stored. Please generate a new itinerary to view it.');
+    return;
+  }
+
+  showPanel('planner', document.querySelector('.sidebar-btn'));
+  itineraryOptions = Array.isArray(savedTrip.options) && savedTrip.options.length === 3
+    ? savedTrip.options
+    : [];
+
+  if (itineraryOptions.length) {
+    selectedItineraryIndex = Number.isInteger(savedTrip.selectedOptionIndex)
+      && savedTrip.selectedOptionIndex >= 0
+      && savedTrip.selectedOptionIndex < itineraryOptions.length
+      ? savedTrip.selectedOptionIndex
+      : 0;
+    renderItineraryOptions();
+    showItineraryOption(selectedItineraryIndex);
+  } else {
+    currentItinerary = savedTrip.itinerary;
+    document.getElementById('itineraryOptions').classList.remove('show');
+    renderItinerary(currentItinerary);
+  }
+}
+
+function deleteSavedTrip(event, index) {
+  event.stopPropagation();
+  savedTrips.splice(index, 1);
+  localStorage.setItem('plango_trips', JSON.stringify(savedTrips));
+  renderSavedTrips();
 }
 
 // Travel assistant chat
